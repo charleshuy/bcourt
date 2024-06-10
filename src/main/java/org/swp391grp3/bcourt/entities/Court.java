@@ -1,0 +1,59 @@
+package org.swp391grp3.bcourt.entities;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
+
+@Getter
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(NON_DEFAULT)
+@Table(name = "court", schema = "bcourt", indexes = {
+        @Index(name = "userId", columnList = "userId")
+})
+public class Court {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "courtId", nullable = false, updatable = false, length = 36)
+    private UUID courtId;
+
+    @Column(name = "courtName", length = 50)
+    private String courtName;
+
+    @Column(name = "location", length = 50)
+    private String location;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private User user;
+
+    @Column(name = "price")
+    private Double price;
+
+    @Column(name = "status")
+    private Boolean status;
+
+    @Column(name = "license", length = 50)
+    private String license;
+
+    @OneToMany(mappedBy = "court")
+    private Set<Favorite> favorites = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "court")
+    private Set<Product> products = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "court")
+    private Set<Review> reviews = new LinkedHashSet<>();
+
+}
