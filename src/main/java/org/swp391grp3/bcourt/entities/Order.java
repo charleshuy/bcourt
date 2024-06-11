@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -26,9 +27,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 })
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidGenerator
     @Column(name = "orderId", nullable = false, updatable = false, length = 36)
-    private UUID orderId;
+    private String orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")

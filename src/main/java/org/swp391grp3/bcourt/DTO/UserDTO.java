@@ -1,31 +1,19 @@
 package org.swp391grp3.bcourt.DTO;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
 
+@Setter
+@Getter
 public class UserDTO {
-    private UUID userId;
+    private String userId;
     private String name;
+    private String role;
 
     public UserDTO() {
     }
 
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

@@ -21,7 +21,7 @@ import java.util.UUID;
 public class UserService
 {
     private final UserRepo userRepo;
-    public User createRole(User role){
+    public User createUser(User role){
         return userRepo.save(role);
     }
     public Page<User> getAllUsers(int page, int size) {
@@ -31,11 +31,15 @@ public class UserService
         UserDTO dto = new UserDTO();
         dto.setUserId(user.getUserId());
         dto.setName(user.getName());
+        dto.setRole(user.getRole().getRoleName());
         // Set other fields as needed
         return dto;
     }
     public Page<UserDTO> getAllUsersReturnDTO(int page, int size) {
         Page<User> usersPage = userRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
         return usersPage.map(this::convertToDTO);
+    }
+    public void deleteUser(User user) {
+        userRepo.delete(user);
     }
 }

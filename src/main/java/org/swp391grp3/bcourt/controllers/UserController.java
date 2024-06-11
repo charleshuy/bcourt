@@ -19,11 +19,12 @@ public class UserController {
     private UserService userService;
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
-        return ResponseEntity.created(URI.create("/users/userId")).body(userService.createRole(user));
+        return ResponseEntity.created(URI.create("/users/userId")).body(userService.createUser(user));
     }
     @GetMapping
     public ResponseEntity<Page<UserDTO>> getAllUser(@RequestParam(value = "page", defaultValue = "0") int page,
                                                     @RequestParam(value = "size", defaultValue = "10") int size){
         return ResponseEntity.ok().body(userService.getAllUsersReturnDTO(page, size));
     }
+
 }

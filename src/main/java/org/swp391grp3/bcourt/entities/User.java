@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -24,9 +25,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 })
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidGenerator
     @Column(name = "userId", nullable = false, updatable = false, length = 36)
-    private UUID userId;
+    private String userId;
 
     @Column(name = "name", length = 50)
     private String name;

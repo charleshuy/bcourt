@@ -20,7 +20,6 @@ import java.util.UUID;
 public class RoleService {
     private final RoleRepo roleRepo;
     public Role createRole(Role role){
-        role.setRoleId(UUID.randomUUID());
         return roleRepo.save(role);
     }
     public List<Role> getRoleList() {
@@ -29,7 +28,7 @@ public class RoleService {
     public Page<Role> getAllRoles(int page, int size) {
         return roleRepo.findAll(PageRequest.of(page, size, Sort.by("roleName")));
     }
-    public Role getRoleById(UUID id) {
+    public Role getRoleById(String id) {
         return roleRepo.findById(id).orElseThrow(() -> new RuntimeException("Role not found"));
     }
     public void deleteRole(Role role){

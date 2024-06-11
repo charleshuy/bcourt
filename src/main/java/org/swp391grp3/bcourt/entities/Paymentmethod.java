@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -22,9 +23,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Table(name = "paymentmethod", schema = "bcourt")
 public class Paymentmethod {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidGenerator
     @Column(name = "methodId", nullable = false, updatable = false, length = 36)
-    private UUID methodId;
+    private String methodId;
 
     @Column(name = "methodName", length = 50)
     private String methodName;

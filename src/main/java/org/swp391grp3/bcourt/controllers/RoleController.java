@@ -1,7 +1,6 @@
 package org.swp391grp3.bcourt.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,21 +14,26 @@ import java.util.UUID;
 @RequestMapping("/roles")
 @RequiredArgsConstructor
 public class RoleController {
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
     @PostMapping
-    public ResponseEntity<Role> createRole(@RequestBody Role role){
-        return ResponseEntity.created(URI.create("/roles/roleId")).body(roleService.createRole(role));
-    }
-    @GetMapping("{id}")
-    public ResponseEntity<Role> getRole(@PathVariable("id") UUID id){
-        return ResponseEntity.ok().body(roleService.getRoleById(id));
-    }
-    @GetMapping
-    public ResponseEntity<Page<Role>> getAllRole(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                 @RequestParam(value = "size", defaultValue = "10") int size){
-        return ResponseEntity.ok().body(roleService.getAllRoles(page, size));
+    public ResponseEntity<Role> createRole(@RequestBody Role role) {
+        Role createdRole = roleService.createRole(role);
+        // Assuming the createdRole has a roleId property
+        URI location = URI.create("/roles/" + createdRole.getRoleId());
+        return ResponseEntity.created(location).body(createdRole);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Role> getRole(@PathVariable String id) {
+        Role role = roleService.getRoleById(id);
+        return ResponseEntity.ok(role);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Role>> getAllRole(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<Role> roles = roleService.getAllRoles(page, size);
+        return ResponseEntity.ok(roles);
+    }
 }
