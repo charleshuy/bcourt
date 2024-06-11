@@ -19,7 +19,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(NON_DEFAULT)
+//@JsonInclude(NON_DEFAULT)
 @Table(name = "court", schema = "bcourt", indexes = {
         @Index(name = "userId", columnList = "userId")
 })
@@ -35,7 +35,7 @@ public class Court {
     @Column(name = "location", length = 50)
     private String location;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
 

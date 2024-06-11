@@ -8,7 +8,6 @@ import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.services.RoleService;
 
 import java.net.URI;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/roles")
