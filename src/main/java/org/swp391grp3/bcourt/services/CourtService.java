@@ -35,5 +35,8 @@ public class CourtService {
         // Set other fields as needed
         return dto;
     }
+    public void deleteCourt(Court court){
+        courtRepo.delete(court);
+    }
 
 }

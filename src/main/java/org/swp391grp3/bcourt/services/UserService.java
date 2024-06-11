@@ -8,11 +8,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.DTO.UserDTO;
-import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Service
 public class UserService
 {
+
     private final UserRepo userRepo;
     public User createUser(User role){
         return userRepo.save(role);
@@ -42,4 +44,20 @@ public class UserService
     public void deleteUser(User user) {
         userRepo.delete(user);
     }
+    public boolean existsByEmail(String email) {
+        return userRepo.existsByEmail(email);
+    }
+
+    private final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+
+    private final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+
+    public boolean isValidEmail(String email) {
+        if (email == null) {
+            return false;
+        }
+        Matcher matcher = EMAIL_PATTERN.matcher(email);
+        return matcher.matches();
+    }
+
 }

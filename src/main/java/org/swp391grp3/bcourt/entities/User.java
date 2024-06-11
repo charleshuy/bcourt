@@ -2,6 +2,8 @@ package org.swp391grp3.bcourt.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +23,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @AllArgsConstructor
 //@JsonInclude(NON_DEFAULT)
 @Table(name = "user", schema = "bcourt", indexes = {
-        @Index(name = "roleId", columnList = "roleId")
+        @Index(name = "roleId", columnList = "roleId"),
+        @Index(name = "uniqueEmail", columnList = "email", unique = true)
 })
 public class User {
     @Id
@@ -37,6 +40,11 @@ public class User {
 
     @Column(name = "address", length = 50)
     private String address;
+
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is mandatory")
+    @Column(name = "email", length = 50, unique = true)
+    private String email;
 
     @Column(name = "phone")
     private Integer phone;
