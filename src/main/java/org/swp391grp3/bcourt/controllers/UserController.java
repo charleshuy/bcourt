@@ -20,20 +20,31 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody User user) {
-        String email = user.getEmail();
-        if (userService.isValidEmail(email)){
-            if (userService.existsByEmail(user.getEmail())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use.");
-            }
-            return ResponseEntity.created(URI.create("/users/" + user.getUserId())).body(userService.createUser(user));
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
+        try {
+            User createdUser = userService.createUser(user);
+            return ResponseEntity.created(URI.create("/users/" + createdUser.getUserId())).body(createdUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is invalid.");
     }
     @GetMapping
     public ResponseEntity<Page<UserDTO>> getAllUser(@RequestParam(value = "page", defaultValue = "0") int page,
                                                     @RequestParam(value = "size", defaultValue = "10") int size){
         return ResponseEntity.ok().body(userService.getAllUsersReturnDTO(page, size));
+    }
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
+        try {
+            userService.deleteUserById(userId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 }

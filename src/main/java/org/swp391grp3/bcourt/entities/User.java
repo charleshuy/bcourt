@@ -46,8 +46,9 @@ public class User {
     @Column(name = "email", length = 50, unique = true)
     private String email;
 
-    @Column(name = "phone")
-    private Integer phone;
+    @NotBlank(message = "Phone number is mandatory")
+    @Column(name = "phone", length = 10) // Changed to String with length 10
+    private String phone;
 
     @Column(name = "walletAmount")
     private Double walletAmount;
