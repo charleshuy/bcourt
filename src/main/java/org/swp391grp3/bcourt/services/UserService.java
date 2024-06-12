@@ -1,9 +1,9 @@
 package org.swp391grp3.bcourt.services;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,8 +14,7 @@ import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.utils.ValidationUtil;
 
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
@@ -24,6 +23,7 @@ import java.util.regex.Pattern;
 public class UserService {
 
     private final UserRepo userRepo;
+    private final ModelMapper modelMapper;
 
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
@@ -80,6 +80,9 @@ public class UserService {
         if (updatedUser.getRole() != null) {
             existingUser.setRole(updatedUser.getRole());
         }
+        if (updatedUser.getEmail() != null) {
+            existingUser.setEmail(updatedUser.getEmail());
+        }
 
         // Collections like courts, favorites, orders, and reviews should generally be handled separately
         // Update other fields as needed
@@ -91,19 +94,9 @@ public class UserService {
         return userRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
     }
 
-    public UserDTO convertToDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setUserId(user.getUserId());
-        dto.setName(user.getName());
-        dto.setRole(user.getRole().getRoleName());
-        // Set other fields as needed
-        return dto;
-    }
-
-
     public Page<UserDTO> getAllUsersReturnDTO(int page, int size) {
         Page<User> usersPage = userRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
-        return usersPage.map(this::convertToDTO);
+        return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
     }
 
     public void deleteUserById(String userId) {

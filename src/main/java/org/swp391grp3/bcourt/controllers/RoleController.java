@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.swp391grp3.bcourt.DTO.RoleDTO;
 import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.services.RoleService;
 
@@ -30,9 +31,9 @@ public class RoleController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Role>> getAllRole(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
-        Page<Role> roles = roleService.getAllRoles(page, size);
-        return ResponseEntity.ok(roles);
+    public ResponseEntity<Page<RoleDTO>> getAllRoles(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                     @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<RoleDTO> roleDTOPage = roleService.getAllRoles(page, size);
+        return ResponseEntity.ok(roleDTOPage);
     }
 }
