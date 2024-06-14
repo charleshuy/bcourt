@@ -33,9 +33,10 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<UserDTO>> getAllUser(@RequestParam(value = "page", defaultValue = "0") int page,
                                                     @RequestParam(value = "size", defaultValue = "10") int size){
-        return ResponseEntity.ok().body(userService.getAllUsersReturnDTO(page, size));
+        Page<User> userPage = userService.getAllUsers(page, size);
+        return ResponseEntity.ok().body(userService.pageUserDTO(page, size, userPage));
     }
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("delete/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable String userId) {
         try {
             userService.deleteUserById(userId);
@@ -46,5 +47,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserDTO>> searchUsersByName(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(required = false) String userName) {
+        Page<User> users = userService.searchUsersByName(page, size, userName);
+        return ResponseEntity.ok(userService.pageUserDTO(page, size, users));
+    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable String userId,
+            @Valid @RequestBody User updatedUser) {
+        try {
+            updatedUser = userService.updateUser(userId, updatedUser);
+            UserDTO updatedDTO = userService.userReturnToDTO(userId, updatedUser);
+            return ResponseEntity.ok(updatedDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

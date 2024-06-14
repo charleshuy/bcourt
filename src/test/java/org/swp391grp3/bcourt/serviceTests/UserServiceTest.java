@@ -5,11 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.*;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.services.UserService;
 import org.swp391grp3.bcourt.utils.ValidationUtil;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,6 +56,24 @@ class UserServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(user));
     }
+    @Test
+    public void getAllUsers_whenValidRequest_shouldReturnUsersPage() {
+        int page = 0;
+        int size = 10;
+
+        List<User> users = Arrays.asList(
+                new User(),
+                new User()
+        );
+        Page<User> usersPage = new PageImpl<>(users, PageRequest.of(page, size, Sort.by("name")), users.size());
+
+        when(userRepo.findAll(any(Pageable.class))).thenReturn(usersPage);
+
+        Page<User> result = userService.getAllUsers(page, size);
+
+        assertEquals(usersPage, result);
+        verify(userRepo, times(1)).findAll(PageRequest.of(page, size, Sort.by("name")));
+    }
 
     @Test
     void updateUser_whenValidUser_shouldUpdateUser() {
@@ -64,12 +85,13 @@ class UserServiceTest {
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(existingUser));
         when(userRepo.existsByEmail(updatedUser.getEmail())).thenReturn(false);
-        when(userRepo.save(existingUser)).thenReturn(existingUser);
+        when(userRepo.save(existingUser)).thenReturn(updatedUser); // Return the updated user after save
 
         User result = userService.updateUser(userId, updatedUser);
 
         assertNotNull(result);
         assertEquals(updatedUser.getEmail(), result.getEmail());
+        verify(userRepo, times(1)).findById(userId);
         verify(userRepo, times(1)).save(existingUser);
     }
 

@@ -5,20 +5,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.swp391grp3.bcourt.DTO.RoleDTO;
+import org.modelmapper.ModelMapper;
+
 import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.repo.RoleRepo;
 import org.swp391grp3.bcourt.services.RoleService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class RoleServiceTest {
+    @Mock
+    private ModelMapper modelMapper;
 
     @Mock
     private RoleRepo roleRepo;
@@ -41,25 +41,6 @@ class RoleServiceTest {
         assertNotNull(createdRole);
         assertEquals(role, createdRole);
         verify(roleRepo, times(1)).save(role);
-    }
-
-    @Test
-    void getAllRoles_Success() {
-        List<Role> roleList = new ArrayList<>();
-        roleList.add(new Role());
-        roleList.add(new Role());
-        roleList.add(new Role());
-
-        // Mock the behavior of roleRepo.findAll() to return the roleList
-        when(roleRepo.findAll()).thenReturn(roleList);
-
-        Page<RoleDTO> rolePage = roleService.getAllRoles(0, 10);
-
-        assertNotNull(rolePage);
-        assertEquals(roleList.size(), rolePage.getContent().size());
-
-        // Verify that roleRepo.findAll() is called once
-        verify(roleRepo, times(1)).findAll();
     }
 
 

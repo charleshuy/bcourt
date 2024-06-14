@@ -28,4 +28,20 @@ class ValidationUtilTest {
         assertFalse(ValidationUtil.isValidPhoneNumber("12345678901"));
         assertFalse(ValidationUtil.isValidPhoneNumber("abcdefg123"));
     }
+    @Test
+    public void isValidName_whenValidName_shouldReturnTrue() {
+        String validName = "John Doe";
+        assertTrue(ValidationUtil.isValidName(validName));
+    }
+
+    @Test
+    public void isValidName_whenInvalidName_shouldReturnFalse() {
+        String invalidName = "John_Doe!";
+        assertFalse(ValidationUtil.isValidName(invalidName));
+    }
+    @Test
+    public void isValidName_whenNameIsNull_shouldReturnFalse() {
+        String nullName = null;
+        assertFalse(ValidationUtil.isValidName(nullName));
+    }
 }

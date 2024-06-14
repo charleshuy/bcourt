@@ -12,5 +12,9 @@ import lombok.Setter;
 public class CourtDTO {
     private String courtId;
     private String courtName;
+    private String location;
+    private Double price;
+    private Boolean status;
+    private String license;
     private String userName;
 }

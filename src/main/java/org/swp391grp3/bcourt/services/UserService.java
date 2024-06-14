@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.DTO.UserDTO;
@@ -27,6 +28,7 @@ public class UserService {
 
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
+        user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
         if (userRepo.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email is already in use");
         }
@@ -43,23 +45,8 @@ public class UserService {
 
         User existingUser = existingUserOpt.get();
 
-        // Validate the new email if it is being updated
-        if (updatedUser.getEmail() != null && !ValidationUtil.isValidEmail(updatedUser.getEmail())) {
-            log.error("Invalid email format: {}", updatedUser.getEmail());
-            throw new RuntimeException("Invalid email format");
-        }
-
-        // Ensure the email is unique if it is being changed
-        if (updatedUser.getEmail() != null && !updatedUser.getEmail().equals(existingUser.getEmail()) && existsByEmail(updatedUser.getEmail())) {
-            log.error("Email already in use: {}", updatedUser.getEmail());
-            throw new RuntimeException("Email already in use");
-        }
-
-        // Validate the phone number if it is being updated
-        if (updatedUser.getPhone() != null && !ValidationUtil.isValidPhoneNumber(updatedUser.getPhone())) {
-            log.error("Invalid phone number: {}", updatedUser.getPhone());
-            throw new RuntimeException("Phone number must be 10 digits");
-        }
+        validateUserFields(updatedUser); // Call the validation method
+        updatedUser.setName(ValidationUtil.normalizeName(updatedUser.getName())); // Normalize the name
 
         // Update fields if they are provided
         if (updatedUser.getName() != null) {
@@ -89,14 +76,21 @@ public class UserService {
 
         return userRepo.save(existingUser);
     }
+    public UserDTO userReturnToDTO(String userId, User user) {
+        UserDTO updatedDTO = modelMapper.map(user, UserDTO.class);
+        return updatedDTO;
+    }
 
     public Page<User> getAllUsers(int page, int size) {
         return userRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
     }
-
-    public Page<UserDTO> getAllUsersReturnDTO(int page, int size) {
-        Page<User> usersPage = userRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
-        return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
+    public Page<UserDTO> pageUserDTO(int page, int size, Page<User> userPage){
+        return userPage.map(user -> modelMapper.map(user, UserDTO.class));
+    }
+    public Page<User> searchUsersByName(int page, int size, String userName) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> usersPage = userRepo.searchUserByName(userName, pageable);
+        return usersPage;
     }
 
     public void deleteUserById(String userId) {
@@ -107,7 +101,6 @@ public class UserService {
             throw new IllegalArgumentException("User not found");
         }
     }
-
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
     }
@@ -118,6 +111,9 @@ public class UserService {
 
         if (!ValidationUtil.isValidPhoneNumber(user.getPhone())) {
             throw new IllegalArgumentException("Phone number must be 10 digits");
+        }
+        if (!ValidationUtil.isValidName(user.getName())) {
+            throw new IllegalArgumentException("Name contains invalid characters");
         }
     }
 

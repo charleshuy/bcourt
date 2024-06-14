@@ -26,13 +26,13 @@ public class CourtController {
     @GetMapping
     public ResponseEntity<Page<CourtDTO>> getAllCourts(@RequestParam(value = "page", defaultValue = "0") int page,
                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
-        return ResponseEntity.ok().body(courtService.getAllCourt(page, size));
+        Page<Court> courts = courtService.getAllCourt(page, size);
+        return ResponseEntity.ok().body(courtService.courtReturnToDTO(page, size, courts));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<Court>> getAllCourtsByUserId(@PathVariable String userId,
-                                                            @RequestParam(value = "page", defaultValue = "0") int page,
-                                                            @RequestParam(value = "size", defaultValue = "10") int size) {
-        return ResponseEntity.ok().body(courtService.getAllCourtByUserId(page, size, userId));
+    public ResponseEntity<CourtDTO> getAllCourtsByUserId(@PathVariable String userId) {
+        Court court = courtService.getCourtByUserId(userId);
+        return ResponseEntity.ok().body(courtService.courtReturnToDTO(court));
     }
 }

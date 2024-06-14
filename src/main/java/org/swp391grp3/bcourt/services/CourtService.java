@@ -22,13 +22,25 @@ public class CourtService {
     public Court createCourt(Court court){
         return courtRepo.save(court);
     }
-    public Page<CourtDTO> getAllCourt(int page, int size) {
+    public Page<Court> getAllCourt(int page, int size) {
         Page<Court> courtPage = courtRepo.findAll(PageRequest.of(page, size, Sort.by("courtName")));
+        return courtPage;
+    }
+    public Page<Court> searchCourtByName(int page, int size, String courtName){
+        Page<Court> courtPage = courtRepo.findCourtByCourseName(courtName, PageRequest.of(page, size, Sort.by("courtName")));
+        return courtPage;
+    }
+    public Page<CourtDTO> courtReturnToDTO(int page, int size, Page<Court> courtPage){
         return courtPage.map(court -> modelMapper.map(court, CourtDTO.class));
     }
-    public Page<Court> getAllCourtByUserId(int page, int size, String userId){
-        return courtRepo.findByUser_UserId(userId, PageRequest.of(page, size, Sort.by("courtName")));
+
+    public Court getCourtByUserId(String userId){
+        return courtRepo.findByUser_UserId(userId);
     }
+    public CourtDTO courtReturnToDTO(Court court){
+        return modelMapper.map(court, CourtDTO.class);
+    }
+
     public void deleteCourt(Court court){
         courtRepo.delete(court);
     }

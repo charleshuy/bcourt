@@ -18,6 +18,7 @@ public class ValidationUtil {
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
     private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{10}");
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z\\s]+$");
 
     public static boolean isValidEmail(String email) {
         if (email == null) {
@@ -26,8 +27,29 @@ public class ValidationUtil {
         Matcher matcher = EMAIL_PATTERN.matcher(email);
         return matcher.matches();
     }
-
+    public static boolean isValidName(String name) {
+        if (name == null) {
+            return false;
+        }
+        Matcher matcher = NAME_PATTERN.matcher(name);
+        return matcher.matches();
+    }
     public static boolean isValidPhoneNumber(String phone) {
         return phone != null && PHONE_PATTERN.matcher(phone).matches();
+    }
+    public static String normalizeName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return name;
+        }
+        String[] words = name.trim().replaceAll("\\s+", " ").split(" ");
+        StringBuilder normalized = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                normalized.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1).toLowerCase())
+                        .append(" ");
+            }
+        }
+        return normalized.toString().trim();
     }
 }
