@@ -12,6 +12,8 @@ import org.swp391grp3.bcourt.DTO.CourtDTO;
 import org.swp391grp3.bcourt.entities.Court;
 import org.swp391grp3.bcourt.repo.CourtRepo;
 
+import java.util.Optional;
+
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
@@ -26,17 +28,17 @@ public class CourtService {
         Page<Court> courtPage = courtRepo.findAll(PageRequest.of(page, size, Sort.by("courtName")));
         return courtPage;
     }
-    public Page<Court> searchCourtByName(int page, int size, String courtName){
-        Page<Court> courtPage = courtRepo.findCourtByCourseName(courtName, PageRequest.of(page, size, Sort.by("courtName")));
-        return courtPage;
+    public Page<Court> searchCourtsByName(int page, int size, String courtName){
+        return courtRepo.findCourtByCourseName(courtName, PageRequest.of(page, size, Sort.by("courtName")));
     }
-    public Page<CourtDTO> courtReturnToDTO(int page, int size, Page<Court> courtPage){
+    public Page<CourtDTO> pageCourtDTO(int page, int size, Page<Court> courtPage){
         return courtPage.map(court -> modelMapper.map(court, CourtDTO.class));
     }
 
     public Court getCourtByUserId(String userId){
         return courtRepo.findByUser_UserId(userId);
     }
+
     public CourtDTO courtReturnToDTO(Court court){
         return modelMapper.map(court, CourtDTO.class);
     }
@@ -44,5 +46,33 @@ public class CourtService {
     public void deleteCourt(Court court){
         courtRepo.delete(court);
     }
+    public Court updateCourt(String courtId, Court updatedCourt) {
+        Optional<Court> existingCourtOpt = courtRepo.findByCourtId(courtId);
 
+        if (!existingCourtOpt.isPresent()) {
+            log.error("Court with ID {} not found", courtId);
+            throw new RuntimeException("Court not found");
+        }
+
+        Court existingCourt = existingCourtOpt.get();
+
+        // Update fields if they are provided
+        if (updatedCourt.getCourtName() != null) {
+            existingCourt.setCourtName(updatedCourt.getCourtName());
+        }
+        if (updatedCourt.getLocation() != null) {
+            existingCourt.setLocation(updatedCourt.getLocation());
+        }
+        if (updatedCourt.getPrice() != null) {
+            existingCourt.setPrice(updatedCourt.getPrice());
+        }
+        if (updatedCourt.getStatus() != null) {
+            existingCourt.setStatus(updatedCourt.getStatus());
+        }
+        if (updatedCourt.getLicense() != null) {
+            existingCourt.setLicense(updatedCourt.getLicense());
+        }
+
+        return courtRepo.save(existingCourt);
+    }
 }

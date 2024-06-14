@@ -1,12 +1,13 @@
 package org.swp391grp3.bcourt.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.swp391grp3.bcourt.DTO.CourtDTO;
 import org.swp391grp3.bcourt.entities.Court;
-import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.services.CourtService;
 
 import java.net.URI;
@@ -27,12 +28,33 @@ public class CourtController {
     public ResponseEntity<Page<CourtDTO>> getAllCourts(@RequestParam(value = "page", defaultValue = "0") int page,
                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<Court> courts = courtService.getAllCourt(page, size);
-        return ResponseEntity.ok().body(courtService.courtReturnToDTO(page, size, courts));
+        return ResponseEntity.ok().body(courtService.pageCourtDTO(page, size, courts));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<CourtDTO> getAllCourtsByUserId(@PathVariable String userId) {
         Court court = courtService.getCourtByUserId(userId);
         return ResponseEntity.ok().body(courtService.courtReturnToDTO(court));
+    }
+    @GetMapping("/search")
+    public ResponseEntity<Page<CourtDTO>> searchCourtsByName(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(required = false) String courtName) {
+        Page<Court> courts = courtService.searchCourtsByName(page, size, courtName == null ? "" : courtName);
+        Page<CourtDTO> courtDTOPage = courtService.pageCourtDTO(page, size, courts);
+        return ResponseEntity.ok(courtDTOPage);
+    }
+    @PutMapping("/update/{courtId}")
+    public ResponseEntity<CourtDTO> updateCourt(
+            @PathVariable String courtId,
+            @Valid @RequestBody Court updatedCourt) {
+        try {
+            Court updatedEntity = courtService.updateCourt(courtId, updatedCourt);
+            CourtDTO updatedDTO = courtService.courtReturnToDTO(updatedEntity);
+            return ResponseEntity.ok(updatedDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }
