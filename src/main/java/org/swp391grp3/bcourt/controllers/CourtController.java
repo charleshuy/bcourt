@@ -19,9 +19,9 @@ public class CourtController {
     private final CourtService courtService;
 
     @PostMapping
-    public ResponseEntity<Court> createRole(@RequestBody Court court) {
+    public ResponseEntity<Court> createCourt(@RequestBody Court court) {
         Court createdCourt = courtService.createCourt(court);
-        URI location = URI.create("/roles/" + createdCourt.getCourtId());
+        URI location = URI.create("/courts/" + createdCourt.getCourtId());
         return ResponseEntity.created(location).body(createdCourt);
     }
     @GetMapping
