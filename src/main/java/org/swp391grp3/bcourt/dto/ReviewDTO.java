@@ -1,5 +1,3 @@
-package org.swp391grp3.bcourt.dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
