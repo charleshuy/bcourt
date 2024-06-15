@@ -39,6 +39,9 @@ public class Order {
     @Column(name = "date")
     private LocalDate date;
 
+    @Column(name = "bookingDate")
+    private LocalDate bookingDate;
+
     @Column(name = "amount")
     private Double amount;
 

@@ -18,6 +18,7 @@ public class OrderDTO {
     private String userId;
     private LocalDate date;
     private Double amount;
+    private LocalDate bookingDate;
     private LocalTime slotStart;
     private LocalTime slotEnd;
     private String methodId;

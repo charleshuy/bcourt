@@ -10,7 +10,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.OrderDTO;
 import org.swp391grp3.bcourt.entities.Order;
-import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.OrderRepo;
 
 import java.time.LocalDate;
@@ -26,6 +25,7 @@ public class OrderService {
     private final ModelMapper modelMapper;
     public Order createOrder(Order order){
         order.setDate(LocalDate.now());
+
         if (order.getSlotStart() == null || order.getSlotEnd() == null) {
             throw new IllegalArgumentException("Slot start and end times must be provided");
         }
@@ -40,7 +40,8 @@ public class OrderService {
         return orderRepo.save(order);
     }
     public Page<Order> getAllOrdersByUserId(int page, int size, String userId) {
-        Page<Order> orders = orderRepo.findByUser_UserId(userId, PageRequest.of(page, size, Sort.by("date")));
+        Sort sort = Sort.by(Sort.Order.asc("date"), Sort.Order.asc("slotStart"));
+        Page<Order> orders = orderRepo.findByUser_UserId(userId, PageRequest.of(page, size, sort));
         return orders;
     }
     public Page<OrderDTO> orderDTOConverter(int page, int size, Page<Order> orders){

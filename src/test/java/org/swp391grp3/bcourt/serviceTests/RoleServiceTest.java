@@ -37,7 +37,6 @@ class RoleServiceTest {
         when(roleRepo.save(role)).thenReturn(role);
 
         Role createdRole = roleService.createRole(role);
-
         assertNotNull(createdRole);
         assertEquals(role, createdRole);
         verify(roleRepo, times(1)).save(role);
