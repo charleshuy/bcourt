@@ -8,9 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.swp391grp3.bcourt.DTO.PaymentMethodDTO;
+import org.swp391grp3.bcourt.dto.PaymentMethodDTO;
 import org.swp391grp3.bcourt.entities.Paymentmethod;
-import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.repo.PaymentRepo;
 
 @Slf4j

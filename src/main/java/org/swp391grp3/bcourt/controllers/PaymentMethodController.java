@@ -5,8 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.swp391grp3.bcourt.DTO.PaymentMethodDTO;
-import org.swp391grp3.bcourt.entities.Court;
+import org.swp391grp3.bcourt.dto.PaymentMethodDTO;
 import org.swp391grp3.bcourt.entities.Paymentmethod;
 import org.swp391grp3.bcourt.services.PaymentService;
 

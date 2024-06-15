@@ -52,7 +52,7 @@ public class Court {
     private Set<Favorite> favorites = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "court")
-    private Set<Product> products = new LinkedHashSet<>();
+    private Set<Order> orders = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "court")
     private Set<Review> reviews = new LinkedHashSet<>();

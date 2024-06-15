@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.swp391grp3.bcourt.DTO.RoleDTO;
+import org.swp391grp3.bcourt.dto.RoleDTO;
 import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.services.RoleService;
 

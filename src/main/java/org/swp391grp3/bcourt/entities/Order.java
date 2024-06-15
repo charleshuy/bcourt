@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -41,11 +42,18 @@ public class Order {
     @Column(name = "amount")
     private Double amount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "slotStart")
+    private LocalTime slotStart;
+
+    @Column(name = "slotEnd")
+    private LocalTime  slotEnd;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "methodId")
     private Paymentmethod method;
 
-    @OneToMany(mappedBy = "order")
-    private Set<Product> products = new LinkedHashSet<>();
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "courtId")
+    private Court court;
 
 }

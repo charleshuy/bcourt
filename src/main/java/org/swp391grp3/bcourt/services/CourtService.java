@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.swp391grp3.bcourt.DTO.CourtDTO;
+import org.swp391grp3.bcourt.dto.CourtDTO;
 import org.swp391grp3.bcourt.entities.Court;
 import org.swp391grp3.bcourt.repo.CourtRepo;
 
@@ -31,7 +31,7 @@ public class CourtService {
     public Page<Court> searchCourtsByName(int page, int size, String courtName){
         return courtRepo.findCourtByCourseName(courtName, PageRequest.of(page, size, Sort.by("courtName")));
     }
-    public Page<CourtDTO> pageCourtDTO(int page, int size, Page<Court> courtPage){
+    public Page<CourtDTO> courtDTOConverter(int page, int size, Page<Court> courtPage){
         return courtPage.map(court -> modelMapper.map(court, CourtDTO.class));
     }
 

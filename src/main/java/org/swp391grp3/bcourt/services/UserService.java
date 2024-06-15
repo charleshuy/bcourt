@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.swp391grp3.bcourt.DTO.UserDTO;
+import org.swp391grp3.bcourt.dto.UserDTO;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.utils.ValidationUtil;

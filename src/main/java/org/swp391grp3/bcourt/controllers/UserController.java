@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.swp391grp3.bcourt.DTO.UserDTO;
+import org.swp391grp3.bcourt.dto.UserDTO;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.services.UserService;
 
