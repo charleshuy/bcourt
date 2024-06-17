@@ -23,10 +23,9 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginDTO loginRequest) {
         Optional<User> userOpt = userService.loginWithEmail(loginRequest.getEmail(), loginRequest.getPassword());
         if (userOpt.isPresent()) {
-            // User authenticated successfully
-            return ResponseEntity.ok().body("Login successful");
+            User user = userOpt.get();
+            return ResponseEntity.ok().body(userService.userReturnToDTO(user)); // Return the whole User object
         } else {
-            // Authentication failed
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
     }
