@@ -14,7 +14,7 @@ public class UserDTO {
     private String phone;
     private Double walletAmount;
     private String email;
-    private String roleName;
+    private RoleDTO role;
 
     public UserDTO() {
     }

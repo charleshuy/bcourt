@@ -12,6 +12,7 @@ import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.services.UserService;
 
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -34,7 +35,7 @@ public class UserController {
     public ResponseEntity<Page<UserDTO>> getAllUser(@RequestParam(value = "page", defaultValue = "0") int page,
                                                     @RequestParam(value = "size", defaultValue = "10") int size){
         Page<User> userPage = userService.getAllUsers(page, size);
-        return ResponseEntity.ok().body(userService.pageUserDTO(page, size, userPage));
+        return ResponseEntity.ok().body(userService.pageUserDTO(userPage));
     }
     @DeleteMapping("delete/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable String userId) {
@@ -53,15 +54,30 @@ public class UserController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(required = false) String userName) {
         Page<User> users = userService.searchUsersByName(page, size, userName);
-        return ResponseEntity.ok(userService.pageUserDTO(page, size, users));
+        return ResponseEntity.ok(userService.pageUserDTO(users));
     }
-    @PutMapping("/{userId}")
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable String userId) {
+        try {
+            User user = userService.getUserById(userId);
+            if (user == null) {
+                return ResponseEntity.notFound().build();
+            }
+            UserDTO userDTO = userService.userReturnToDTO(user);
+            return ResponseEntity.ok(userDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping
     public ResponseEntity<UserDTO> updateUser(
-            @PathVariable String userId,
             @Valid @RequestBody User updatedUser) {
         try {
-            updatedUser = userService.updateUser(userId, updatedUser);
-            UserDTO updatedDTO = userService.userReturnToDTO(userId, updatedUser);
+            updatedUser = userService.updateUser(updatedUser);
+            UserDTO updatedDTO = userService.userReturnToDTO(updatedUser);
             return ResponseEntity.ok(updatedDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

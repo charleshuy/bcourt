@@ -7,10 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.swp391grp3.bcourt.entities.User;
 
+import java.util.Optional;
+
 
 @Repository
 public interface UserRepo extends JpaRepository<User, String> {
     boolean existsByEmail(String email);
     @Query("SELECT u FROM User u WHERE lower(u.name) like lower(concat('%', :userName, '%'))")
     Page<User> searchUserByName(String userName, Pageable pageable);
+    Optional<User> findByEmail(String email);
+    User findByUserId(String userId);
 }

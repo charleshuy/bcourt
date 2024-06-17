@@ -87,7 +87,7 @@ class UserServiceTest {
         when(userRepo.existsByEmail(updatedUser.getEmail())).thenReturn(false);
         when(userRepo.save(existingUser)).thenReturn(updatedUser); // Return the updated user after save
 
-        User result = userService.updateUser(userId, updatedUser);
+        User result = userService.updateUser( updatedUser);
 
         assertNotNull(result);
         assertEquals(updatedUser.getEmail(), result.getEmail());
@@ -105,7 +105,7 @@ class UserServiceTest {
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(existingUser));
 
-        assertThrows(RuntimeException.class, () -> userService.updateUser(userId, updatedUser));
+        assertThrows(RuntimeException.class, () -> userService.updateUser(updatedUser));
     }
 
     @Test

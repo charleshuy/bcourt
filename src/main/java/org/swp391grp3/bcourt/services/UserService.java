@@ -7,7 +7,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.UserDTO;
 import org.swp391grp3.bcourt.entities.User;
@@ -25,17 +24,21 @@ public class UserService {
 
     private final UserRepo userRepo;
     private final ModelMapper modelMapper;
+    //private final PasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
+        //String encodedPassword = passwordEncoder.encode(user.getPassword());
+        //user.setPassword(encodedPassword);
         if (userRepo.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email is already in use");
         }
         return userRepo.save(user);
     }
     @Transactional
-    public User updateUser(String userId, User updatedUser) {
+    public User updateUser(User updatedUser) {
+        String userId = updatedUser.getUserId();
         Optional<User> existingUserOpt = userRepo.findById(userId);
 
         if (!existingUserOpt.isPresent()) {
@@ -76,16 +79,19 @@ public class UserService {
 
         return userRepo.save(existingUser);
     }
-    public UserDTO userReturnToDTO(String userId, User user) {
+    public UserDTO userReturnToDTO(User user) {
         UserDTO updatedDTO = modelMapper.map(user, UserDTO.class);
         return updatedDTO;
     }
 
     public Page<User> getAllUsers(int page, int size) {
-        return userRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
+        return userRepo.findAll(PageRequest.of(page, size));
     }
-    public Page<UserDTO> pageUserDTO(int page, int size, Page<User> userPage){
+    public Page<UserDTO> pageUserDTO(Page<User> userPage){
         return userPage.map(user -> modelMapper.map(user, UserDTO.class));
+    }
+    public User getUserById(String userId){
+        return userRepo.findByUserId(userId);
     }
     public Page<User> searchUsersByName(int page, int size, String userName) {
         Pageable pageable = PageRequest.of(page, size);
@@ -116,5 +122,17 @@ public class UserService {
             throw new IllegalArgumentException("Name contains invalid characters");
         }
     }
+    public Optional<User> loginWithEmail(String email, String password) {
+        Optional<User> userOpt = userRepo.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (password.matches(user.getPassword())) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
+
 
 }
