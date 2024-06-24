@@ -15,8 +15,11 @@ import org.swp391grp3.bcourt.repo.UserRepo;
 @Service
 public class UserDetailsImpl implements UserDetailsService {
     private final UserRepo userRepo;
+    private String email;
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        this.email = email;
         return userRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
     }
 }

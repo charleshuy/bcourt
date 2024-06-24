@@ -51,6 +51,9 @@ public class Order {
     @Column(name = "slotEnd")
     private LocalTime  slotEnd;
 
+    @Column(name = "status")
+    private boolean  status;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "methodId")
     private Paymentmethod method;
