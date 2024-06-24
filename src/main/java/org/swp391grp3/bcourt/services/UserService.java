@@ -29,6 +29,7 @@ public class UserService {
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
+        user.setWalletAmount(0.0);
         //String encodedPassword = passwordEncoder.encode(user.getPassword());
         //user.setPassword(encodedPassword);
         if (userRepo.existsByEmail(user.getEmail())) {
@@ -110,7 +111,7 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
     }
-    private void validateUserFields(User user) {
+    public void validateUserFields(User user) {
         if (!ValidationUtil.isValidEmail(user.getEmail())) {
             throw new IllegalArgumentException("Invalid email format");
         }

@@ -16,5 +16,5 @@ public class CourtDTO {
     private Double price;
     private Boolean status;
     private String license;
-    private String userName;
+    private UserDTO user;
 }
