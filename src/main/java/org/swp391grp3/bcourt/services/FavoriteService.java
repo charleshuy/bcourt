@@ -18,8 +18,16 @@ public class FavoriteService {
     public Favorite createFavorite(Favorite favo){
         return favoriteRepo.save(favo);
     }
+
     private Page<Favorite> getFavoritesByUserId(int page, int size, String userId){
         return favoriteRepo.findByUser_UserId(userId, PageRequest.of(page, size));
     }
+    public void deleteFavoriteById(String id){
+        Favorite favo = favoriteRepo.findById(id).orElseThrow(() -> new RuntimeException("Favorite not found"));
+        favoriteRepo.delete(favo);
+    }
 
+    public void deleteFavorite(Favorite favo){
+        favoriteRepo.delete(favo);
+    }
 }
