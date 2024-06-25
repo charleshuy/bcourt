@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.swp391grp3.bcourt.entities.User;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +18,7 @@ public class ValidationUtil {
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
     private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{10}");
     private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z\\s]+$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?`~]{8,16}$");
 
     public static boolean isValidEmail(String email) {
         if (email == null) {
@@ -32,6 +32,13 @@ public class ValidationUtil {
             return false;
         }
         Matcher matcher = NAME_PATTERN.matcher(name);
+        return matcher.matches();
+    }
+    public static boolean isValidPassword(String password) {
+        if (password == null) {
+            return false;
+        }
+        Matcher matcher = PASSWORD_PATTERN.matcher(password);
         return matcher.matches();
     }
     public static boolean isValidPhoneNumber(String phone) {

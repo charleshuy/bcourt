@@ -13,6 +13,7 @@ import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.utils.ValidationUtil;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
@@ -24,6 +25,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
 
     public AuthenticationResponse login(User request ){
         authenticationManager.authenticate(
@@ -43,7 +45,15 @@ public class AuthenticationService {
             throw new IllegalArgumentException("Email is already in use");
         }
         request.setPassword(passwordEncoder.encode(request.getPassword()));
+        request.setEnabled(false); // Set enabled to false until email is verified
+        request.setVerificationToken(UUID.randomUUID().toString()); // Generate a verification token
+
         userRepo.save(request);
+
+        // Send verification email
+        String verificationLink = "http://localhost:8080/auth/verify?token=" + request.getVerificationToken();
+        emailService.sendEmail(request.getEmail(), "Email Verification", "Click the link to verify your email: " + verificationLink);
+
         String token = jwtService.generateToken(request);
         return new AuthenticationResponse(token);
     }

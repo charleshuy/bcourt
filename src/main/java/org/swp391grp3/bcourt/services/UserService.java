@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.UserDTO;
 import org.swp391grp3.bcourt.entities.User;
@@ -24,14 +25,14 @@ public class UserService {
 
     private final UserRepo userRepo;
     private final ModelMapper modelMapper;
-    //private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
         user.setWalletAmount(0.0);
-        //String encodedPassword = passwordEncoder.encode(user.getPassword());
-        //user.setPassword(encodedPassword);
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
         if (userRepo.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email is already in use");
         }
@@ -115,12 +116,14 @@ public class UserService {
         if (!ValidationUtil.isValidEmail(user.getEmail())) {
             throw new IllegalArgumentException("Invalid email format");
         }
-
         if (!ValidationUtil.isValidPhoneNumber(user.getPhone())) {
             throw new IllegalArgumentException("Phone number must be 10 digits");
         }
         if (!ValidationUtil.isValidName(user.getName())) {
             throw new IllegalArgumentException("Name contains invalid characters");
+        }
+        if (!ValidationUtil.isValidPassword(user.getPassword())) {
+            throw new IllegalArgumentException("Password must be 8-16 characters long");
         }
     }
     public Optional<User> loginWithEmail(String email, String password) {

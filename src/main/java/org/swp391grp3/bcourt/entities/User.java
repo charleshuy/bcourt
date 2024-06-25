@@ -55,6 +55,12 @@ public class User implements UserDetails {
     @Column(name = "walletAmount")
     private Double walletAmount;
 
+    @Column(name = "enabled")
+    private Boolean enabled;
+
+    @Column(name = "verificationToken")
+    private String verificationToken;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "roleId")
     private Role role;
@@ -99,6 +105,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled != null && this.enabled;
     }
 }

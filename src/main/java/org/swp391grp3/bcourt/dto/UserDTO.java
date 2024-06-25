@@ -18,5 +18,6 @@ public class UserDTO {
     private String phone;
     private Double walletAmount;
     private String email;
+    private Boolean enabled;
     private RoleDTO role;
 }
