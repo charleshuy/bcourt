@@ -57,9 +57,6 @@ public class UserService {
         if (updatedUser.getName() != null) {
             existingUser.setName(updatedUser.getName());
         }
-        if (updatedUser.getAddress() != null) {
-            existingUser.setAddress(updatedUser.getAddress());
-        }
         if (updatedUser.getPhone() != null) {
             existingUser.setPhone(updatedUser.getPhone());
         }

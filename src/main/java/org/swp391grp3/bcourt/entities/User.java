@@ -40,8 +40,6 @@ public class User implements UserDetails {
     @Column(name = "password", length = 60)
     private String password;
 
-    @Column(name = "address", length = 50)
-    private String address;
 
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is mandatory")
