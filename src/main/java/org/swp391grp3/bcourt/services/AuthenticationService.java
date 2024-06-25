@@ -14,8 +14,7 @@ import org.swp391grp3.bcourt.repo.RoleRepo;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.utils.ValidationUtil;
 
-import java.util.Collections;
-import java.util.Optional;
+
 import java.util.UUID;
 
 @Slf4j
