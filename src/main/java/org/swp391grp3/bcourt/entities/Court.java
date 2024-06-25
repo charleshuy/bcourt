@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -32,6 +33,9 @@ public class Court {
 
     @Column(name = "courtName", length = 50)
     private String courtName;
+
+    @Column(name = "img", length = 255)
+    private String courtImg;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "locationId")
@@ -58,5 +62,13 @@ public class Court {
 
     @OneToMany(mappedBy = "court")
     private Set<Review> reviews = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "court_timeslot",
+            joinColumns = @JoinColumn(name = "court_id"),
+            inverseJoinColumns = @JoinColumn(name = "timeslot_id")
+    )
+    private Set<TimeSlot> timeSlots = new HashSet<>();
 
 }
