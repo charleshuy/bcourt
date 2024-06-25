@@ -4,13 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.swp391grp3.bcourt.entities.Court;
 import org.swp391grp3.bcourt.entities.Favorite;
-import org.swp391grp3.bcourt.entities.Review;
 import org.swp391grp3.bcourt.services.FavoriteService;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/favorites")
