@@ -8,10 +8,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.AuthenticationResponse;
+import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.entities.User;
+import org.swp391grp3.bcourt.repo.RoleRepo;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.utils.ValidationUtil;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,6 +24,7 @@ import java.util.UUID;
 @Service
 public class AuthenticationService {
     private final UserRepo userRepo;
+    private final RoleRepo roleRepo;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -37,8 +41,12 @@ public class AuthenticationService {
         String token = jwtService.generateToken(user);
         return new AuthenticationResponse(token);
     }
-    public  AuthenticationResponse register(User request) {
+    public AuthenticationResponse register(User request) {
         userService.validateUserFields(request);
+
+        Role role = roleRepo.findByRoleName("Customer").orElseThrow(()-> new RuntimeException("Role not found"));
+
+        request.setRole(role);
         request.setName(ValidationUtil.normalizeName(request.getName()));
         request.setWalletAmount(0.0);
         if (userRepo.existsByEmail(request.getEmail())) {
@@ -47,6 +55,8 @@ public class AuthenticationService {
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         request.setEnabled(false); // Set enabled to false until email is verified
         request.setVerificationToken(UUID.randomUUID().toString()); // Generate a verification token
+
+
 
         userRepo.save(request);
 
