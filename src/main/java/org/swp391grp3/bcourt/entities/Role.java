@@ -23,7 +23,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Table(name = "role", schema = "bcourt")
 public class Role {
     @Id
-    @Column(name = "roleId", nullable = false, updatable = false)
+    @UuidGenerator
+    @Column(name = "roleId", nullable = false, updatable = false, length = 36)
     private String roleId;
 
     @Column(name = "roleName", length = 50)
