@@ -21,7 +21,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @AllArgsConstructor
 //@JsonInclude(NON_DEFAULT)
 @Table(name = "court", schema = "bcourt", indexes = {
-        @Index(name = "userId", columnList = "userId")
+        @Index(name = "userId", columnList = "userId"),
+        @Index(name = "locationId", columnList = "LocationId")
 })
 public class Court {
     @Id
@@ -32,8 +33,9 @@ public class Court {
     @Column(name = "courtName", length = 50)
     private String courtName;
 
-    @Column(name = "location", length = 50)
-    private String location;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "locationId")
+    private Location location;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")

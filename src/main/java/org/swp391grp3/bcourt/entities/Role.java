@@ -23,8 +23,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Table(name = "role", schema = "bcourt")
 public class Role {
     @Id
-    @UuidGenerator
-    @Column(name = "roleId", nullable = false, updatable = false, length = 36)
+    @Column(name = "roleId", nullable = false, updatable = false)
     private String roleId;
 
     @Column(name = "roleName", length = 50)
@@ -32,6 +31,5 @@ public class Role {
 
     @OneToMany(mappedBy = "role")
     private Set<User> users = new LinkedHashSet<>();
-
 
 }

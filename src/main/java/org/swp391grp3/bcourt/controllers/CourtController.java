@@ -19,10 +19,10 @@ public class CourtController {
     private final CourtService courtService;
 
     @PostMapping
-    public ResponseEntity<Court> createCourt(@RequestBody Court court) {
+    public ResponseEntity<CourtDTO> createCourt(@RequestBody Court court) {
         Court createdCourt = courtService.createCourt(court);
         URI location = URI.create("/courts/" + createdCourt.getCourtId());
-        return ResponseEntity.created(location).body(createdCourt);
+        return ResponseEntity.created(location).body(courtService.courtReturnToDTO(createdCourt));
     }
     @GetMapping
     public ResponseEntity<Page<CourtDTO>> getAllCourts(@RequestParam(value = "page", defaultValue = "0") int page,
