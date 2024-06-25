@@ -19,7 +19,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@RequestBody Order order) {
         Order createOrder = service.createOrder(order);
-        URI location = URI.create("/courts/" + createOrder.getOrderId());
+        URI location = URI.create("/orders/" + createOrder.getOrderId());
         return ResponseEntity.created(location).body(service.orderDTOConverter(createOrder));
     }
     @GetMapping("/user/{userId}")
@@ -29,10 +29,10 @@ public class OrderController {
         Page<Order> orders = service.getAllOrdersByUserId(page, size, userId);
         return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
     }
-    @DeleteMapping("delete/{orderId}")
+    @DeleteMapping("/delete/{orderId}")
     public ResponseEntity<?> deleteOrderById(@PathVariable String orderId) {
         try {
-            service.deleteOrder(orderId);
+            service.deleteOrderById(orderId);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
