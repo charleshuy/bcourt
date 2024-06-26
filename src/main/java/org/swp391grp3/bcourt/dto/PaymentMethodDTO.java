@@ -12,6 +12,5 @@ import lombok.Setter;
 public class PaymentMethodDTO {
     private String methodId;
     private String methodName;
-    private String userId;
     private String name;
 }

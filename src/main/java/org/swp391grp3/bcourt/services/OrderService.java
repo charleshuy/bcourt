@@ -49,6 +49,9 @@ public class OrderService {
         order.setAmount(amountCal(order));
         return orderRepo.save(order);
     }
+    public Page<Order> getAllOrders(int page, int size) {
+        return orderRepo.findAll(PageRequest.of(page, size));
+    }
     public Page<Order> getAllOrdersByUserId(int page, int size, String userId) {
         Sort sort = Sort.by(Sort.Order.asc("date"), Sort.Order.asc("slotStart"));
         Page<Order> orders = orderRepo.findByUser_UserId(userId, PageRequest.of(page, size, sort));

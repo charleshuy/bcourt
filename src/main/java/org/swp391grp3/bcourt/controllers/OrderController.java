@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.swp391grp3.bcourt.dto.OrderDTO;
+import org.swp391grp3.bcourt.dto.UserDTO;
 import org.swp391grp3.bcourt.entities.Order;
+import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.services.OrderService;
 
 import java.net.URI;
@@ -21,6 +23,12 @@ public class OrderController {
         Order createOrder = service.createOrder(order);
         URI location = URI.create("/courts/" + createOrder.getOrderId());
         return ResponseEntity.created(location).body(service.orderDTOConverter(createOrder));
+    }
+    @GetMapping
+    public ResponseEntity<Page<OrderDTO>> getAllOrders(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                    @RequestParam(value = "size", defaultValue = "10") int size){
+        Page<Order> orders = service.getAllOrders(page, size);
+        return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
     }
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<OrderDTO>> getAllOrdersByUserId(@RequestParam(value = "page", defaultValue = "0") int page,

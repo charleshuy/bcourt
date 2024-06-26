@@ -29,6 +29,7 @@ public class JwtService {
         String token = Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("roleName", user.getRole().getRoleName()) // Adding roleId claim
+                .claim("userId", user.getUserId())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
                 .signWith(getSigningKey())

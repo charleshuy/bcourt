@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.swp391grp3.bcourt.entities.Paymentmethod;
 import org.swp391grp3.bcourt.entities.User;
 
 import java.time.LocalDate;
@@ -21,7 +22,6 @@ public class OrderDTO {
     private LocalDate bookingDate;
     private LocalTime slotStart;
     private LocalTime slotEnd;
-    private String methodId;
     private String methodName;
     private String courtId;
     private String courtName;
