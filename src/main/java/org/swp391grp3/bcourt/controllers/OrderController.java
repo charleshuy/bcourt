@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.swp391grp3.bcourt.dto.OrderDTO;
-import org.swp391grp3.bcourt.dto.UserDTO;
 import org.swp391grp3.bcourt.entities.Order;
-import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.services.OrderService;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/orders")
@@ -46,6 +46,19 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    @GetMapping("/court/{courtId}/date/{bookingDate}")
+    public ResponseEntity<Page<OrderDTO>> getOrdersByCourtAndDate(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                  @PathVariable String courtId,
+                                                                  @PathVariable String bookingDate) {
+        try {
+            LocalDate date = LocalDate.parse(bookingDate);
+            Page<Order> orders = service.getOrdersByCourtAndDate(courtId, date, page, size);
+            return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(null); // Handle invalid date format
         }
     }
 }

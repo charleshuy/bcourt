@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.OrderDTO;
@@ -62,6 +63,9 @@ public class OrderService {
     }
     public Page<OrderDTO> orderDTOConverter(int page, int size, Page<Order> orders){
         return orders.map(order -> modelMapper.map(order, OrderDTO.class));
+    }
+    public Page<Order> getOrdersByCourtAndDate(String courtId, LocalDate date, int page, int size) {
+        return orderRepo.findByCourtAndBookingDate(courtId, date, PageRequest.of(page, size));
     }
     private boolean isSlotOverlapping(Order order) {
         List<Order> existingOrders = orderRepo.findByCourtAndBookingDate(order.getCourt().getCourtId(), order.getBookingDate());

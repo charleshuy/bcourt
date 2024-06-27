@@ -12,6 +12,11 @@ import java.util.List;
 
 public interface OrderRepo extends JpaRepository<Order, String> {
     Page<Order> findByUser_UserId(String userId, Pageable pageable);
+
     @Query("SELECT o FROM Order o WHERE o.court.courtId = :courtId AND o.bookingDate = :bookingDate")
     List<Order> findByCourtAndBookingDate(@Param("courtId") String courtId, @Param("bookingDate") LocalDate bookingDate);
+
+    // New method for paginated results
+    @Query("SELECT o FROM Order o WHERE o.court.courtId = :courtId AND o.bookingDate = :bookingDate")
+    Page<Order> findByCourtAndBookingDate(@Param("courtId") String courtId, @Param("bookingDate") LocalDate bookingDate, Pageable pageable);
 }
