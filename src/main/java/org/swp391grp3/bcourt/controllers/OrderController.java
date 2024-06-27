@@ -21,7 +21,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@RequestBody Order order) {
         Order createOrder = service.createOrder(order);
-        URI location = URI.create("/courts/" + createOrder.getOrderId());
+        URI location = URI.create("/orders/" + createOrder.getOrderId());
         return ResponseEntity.created(location).body(service.orderDTOConverter(createOrder));
     }
     @GetMapping

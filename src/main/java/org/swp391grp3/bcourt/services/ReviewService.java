@@ -32,6 +32,10 @@ public class ReviewService {
         return reviewRepo.findByUser_UserId(userId, PageRequest.of(page, size, Sort.by("reviewId")));
     }
 
+    public Page<Review> getAllReviewsByCourtId(int page, int size, String courtId){
+        return reviewRepo.findByCourt_CourtId(courtId, PageRequest.of(page, size, Sort.by("reviewId")));
+    }
+
     public Review updateReview(String id, Review updatedReview){
         Review existingReview = reviewRepo.findById(id).orElseThrow(()-> new RuntimeException("Review not found"));
 

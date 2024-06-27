@@ -7,4 +7,5 @@ import org.swp391grp3.bcourt.entities.Review;
 
 public interface ReviewRepo extends JpaRepository<Review, String> {
     Page<Review> findByUser_UserId(String userId, Pageable pageable);
+    Page<Review> findByCourt_CourtId(String courtId, Pageable pageable);
 }

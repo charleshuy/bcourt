@@ -29,7 +29,20 @@ public class ReviewController {
                                                            @RequestParam(value = "size", defaultValue = "10") int size,
                                                            @PathVariable String userId) {
     Page<Review> reviews = reviewService.getAllReviewsByUserId(page, size, userId);
+    return ResponseEntity.ok().body(reviewService.reviewDTOConverter(page, size, reviews));
+    }
+
+    @GetMapping("/court/{courtId}")
+    public ResponseEntity<Page<ReviewDTO>> getAllReviewsByCourtId(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                  @PathVariable String courtId){
+        Page<Review> reviews = reviewService.getAllReviewsByCourtId(page, size, courtId);
         return ResponseEntity.ok().body(reviewService.reviewDTOConverter(page, size, reviews));
+    }
+
+    @PutMapping("/update/{reviewId}")
+    public ResponseEntity<Review> updateReview(@PathVariable String reviewId, @RequestBody Review updatedReview) {
+        return ResponseEntity.ok().body(reviewService.updateReview(reviewId, updatedReview));
     }
 
     @DeleteMapping("/delete/{reviewId}")
