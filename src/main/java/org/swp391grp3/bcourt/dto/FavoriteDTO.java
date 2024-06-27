@@ -11,4 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FavoriteDTO {
     private String saveId;
+    private String userId;
+    private String userName;
+    private String courtName;
+    private String courtId;
 }
