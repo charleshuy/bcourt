@@ -35,8 +35,8 @@ public class CourtService {
         return courtPage.map(court -> modelMapper.map(court, CourtDTO.class));
     }
 
-    public Court getCourtByUserId(String userId){
-        return courtRepo.findByUser_UserId(userId);
+    public Page<Court> getCourtByUserId(int page, int size,String userId){
+        return courtRepo.findByUser_UserId(userId, PageRequest.of(page, size));
     }
 
     public CourtDTO courtReturnToDTO(Court court){

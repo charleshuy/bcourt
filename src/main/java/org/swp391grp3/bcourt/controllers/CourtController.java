@@ -32,9 +32,11 @@ public class CourtController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<CourtDTO> getAllCourtsByUserId(@PathVariable String userId) {
-        Court court = courtService.getCourtByUserId(userId);
-        return ResponseEntity.ok().body(courtService.courtReturnToDTO(court));
+    public ResponseEntity<Page<CourtDTO>> getAllCourtsByUserId(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                               @RequestParam(value = "size", defaultValue = "10") int size,
+                                                               @PathVariable String userId) {
+        Page<Court> courts = courtService.getCourtByUserId(page, size, userId);
+        return ResponseEntity.ok().body(courtService.courtDTOConverter(page, size,courts));
     }
     @GetMapping("/search")
     public ResponseEntity<Page<CourtDTO>> searchCourtsByName(

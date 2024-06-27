@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface CourtRepo extends JpaRepository<Court, String> {
     Optional<Court> findByCourtId(String courtId);
-    Court findByUser_UserId(String userId);
+    Page<Court> findByUser_UserId(String userId , Pageable pageable);
     @Query("SELECT c FROM Court c WHERE lower(c.courtName) like lower(concat('%', :courtName, '%'))")
     Page<Court> findCourtByCourseName(String courtName, Pageable pageable);
 }

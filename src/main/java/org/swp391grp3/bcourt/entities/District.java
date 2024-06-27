@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -19,6 +20,7 @@ import java.util.Set;
 })
 public class District {
     @Id
+    @UuidGenerator
     @Column(name = "districtId", nullable = false, updatable = false)
     private String districtId;
 

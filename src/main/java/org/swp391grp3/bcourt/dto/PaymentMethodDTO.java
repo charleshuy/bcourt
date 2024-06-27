@@ -12,5 +12,4 @@ import lombok.Setter;
 public class PaymentMethodDTO {
     private String methodId;
     private String methodName;
-    private String name;
 }

@@ -14,5 +14,4 @@ import java.util.List;
 public class CityDTO {
     private String cityId;
     private String cityName;
-    private DistrictDTO districts;
 }

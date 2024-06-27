@@ -16,7 +16,6 @@ import org.swp391grp3.bcourt.utils.ValidationUtil;
 
 import java.util.Optional;
 
-
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
@@ -38,6 +37,7 @@ public class UserService {
         }
         return userRepo.save(user);
     }
+
     @Transactional
     public User updateUser(User updatedUser) {
         String userId = updatedUser.getUserId();
@@ -50,11 +50,9 @@ public class UserService {
 
         User existingUser = existingUserOpt.get();
 
-        validateUserUpdateFields(updatedUser); // Call the validation method excluding password
-        updatedUser.setName(ValidationUtil.normalizeName(updatedUser.getName())); // Normalize the name
-
         // Update fields if they are provided
         if (updatedUser.getName() != null) {
+            updatedUser.setName(ValidationUtil.normalizeName(updatedUser.getName())); // Normalize the name
             existingUser.setName(updatedUser.getName());
         }
         if (updatedUser.getPhone() != null) {
@@ -70,11 +68,12 @@ public class UserService {
             existingUser.setEmail(updatedUser.getEmail());
         }
 
-        // Collections like courts, favorites, orders, and reviews should generally be handled separately
-        // Update other fields as needed
+        // Validate updated user fields
+        validateUserUpdateFields(existingUser);
 
         return userRepo.save(existingUser);
     }
+
     public UserDTO userReturnToDTO(User user) {
         UserDTO updatedDTO = modelMapper.map(user, UserDTO.class);
         return updatedDTO;
@@ -83,12 +82,15 @@ public class UserService {
     public Page<User> getAllUsers(int page, int size) {
         return userRepo.findAll(PageRequest.of(page, size));
     }
+
     public Page<UserDTO> pageUserDTO(Page<User> userPage){
         return userPage.map(user -> modelMapper.map(user, UserDTO.class));
     }
+
     public User getUserById(String userId){
         return userRepo.findByUserId(userId);
     }
+
     public Page<User> searchUsersByName(int page, int size, String userName) {
         Pageable pageable = PageRequest.of(page, size);
         Page<User> usersPage = userRepo.searchUserByName(userName, pageable);
@@ -103,20 +105,23 @@ public class UserService {
             throw new IllegalArgumentException("User not found");
         }
     }
+
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
     }
+
     public void validateUserUpdateFields(User user) {
-        if (!ValidationUtil.isValidEmail(user.getEmail())) {
+        if (user.getEmail() != null && !ValidationUtil.isValidEmail(user.getEmail())) {
             throw new IllegalArgumentException("Invalid email format");
         }
-        if (!ValidationUtil.isValidPhoneNumber(user.getPhone())) {
+        if (user.getPhone() != null && !ValidationUtil.isValidPhoneNumber(user.getPhone())) {
             throw new IllegalArgumentException("Phone number must be 10 digits");
         }
-        if (!ValidationUtil.isValidName(user.getName())) {
+        if (user.getName() != null && !ValidationUtil.isValidName(user.getName())) {
             throw new IllegalArgumentException("Name contains invalid characters");
         }
     }
+
     public void validateUserFields(User user) {
         if (!ValidationUtil.isValidEmail(user.getEmail())) {
             throw new IllegalArgumentException("Invalid email format");
@@ -131,6 +136,7 @@ public class UserService {
             throw new IllegalArgumentException("Password must be 8-16 characters long");
         }
     }
+
     public Optional<User> loginWithEmail(String email, String password) {
         Optional<User> userOpt = userRepo.findByEmail(email);
         if (userOpt.isPresent()) {
@@ -141,7 +147,4 @@ public class UserService {
         }
         return Optional.empty();
     }
-
-
-
 }

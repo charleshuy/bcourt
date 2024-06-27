@@ -22,7 +22,8 @@ public class OrderDTO {
     private LocalDate bookingDate;
     private LocalTime slotStart;
     private LocalTime slotEnd;
-    private String methodName;
+    private String methodMethodId;
+    private String methodMethodName;
     private String courtId;
     private String courtName;
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.OrderDTO;
 import org.swp391grp3.bcourt.entities.Court;
 import org.swp391grp3.bcourt.entities.Order;
+import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.CourtRepo;
 import org.swp391grp3.bcourt.repo.OrderRepo;
 
@@ -27,6 +28,7 @@ import java.util.Optional;
 public class OrderService {
     private final OrderRepo orderRepo;
     private final CourtRepo courtRepo;
+    private final UserService userService;
     private final ModelMapper modelMapper;
     public Order createOrder(Order order){
         String courtId = order.getCourt().getCourtId();
@@ -48,6 +50,14 @@ public class OrderService {
             throw new IllegalArgumentException("Time slot overlaps with an existing order");
         }
         order.setAmount(amountCal(order));
+        if ("E-Wallet".equals(order.getMethod().getMethodName())) {
+            User user = userService.getUserById(order.getUser().getUserId());
+            if (user.getWalletAmount() < order.getAmount()) {
+                throw new IllegalArgumentException("Insufficient wallet balance");
+            }
+            user.setWalletAmount(user.getWalletAmount() - order.getAmount());
+            userService.updateUser(user);
+        }
         return orderRepo.save(order);
     }
     public Page<Order> getAllOrders(int page, int size) {

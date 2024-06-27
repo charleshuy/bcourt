@@ -16,5 +16,4 @@ public class DistrictDTO {
     private String districtId;
     private String districtName;
     private CityDTO city;
-    private Set<String> LocationIds;
 }
