@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentMethodDTO {
-    private String methodId;
-    private String methodName;
-    private String name;
+public class CityDTO {
+    private String cityId;
+    private String cityName;
+    private DistrictDTO districts;
 }

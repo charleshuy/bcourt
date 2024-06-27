@@ -50,18 +50,12 @@ public class UserService {
 
         User existingUser = existingUserOpt.get();
 
-        validateUserFields(updatedUser); // Call the validation method
+        validateUserUpdateFields(updatedUser); // Call the validation method excluding password
         updatedUser.setName(ValidationUtil.normalizeName(updatedUser.getName())); // Normalize the name
 
         // Update fields if they are provided
         if (updatedUser.getName() != null) {
             existingUser.setName(updatedUser.getName());
-        }
-        if (updatedUser.getPassword() != null) {
-            existingUser.setPassword(updatedUser.getPassword());
-        }
-        if (updatedUser.getAddress() != null) {
-            existingUser.setAddress(updatedUser.getAddress());
         }
         if (updatedUser.getPhone() != null) {
             existingUser.setPhone(updatedUser.getPhone());
@@ -111,6 +105,17 @@ public class UserService {
     }
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
+    }
+    public void validateUserUpdateFields(User user) {
+        if (!ValidationUtil.isValidEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+        if (!ValidationUtil.isValidPhoneNumber(user.getPhone())) {
+            throw new IllegalArgumentException("Phone number must be 10 digits");
+        }
+        if (!ValidationUtil.isValidName(user.getName())) {
+            throw new IllegalArgumentException("Name contains invalid characters");
+        }
     }
     public void validateUserFields(User user) {
         if (!ValidationUtil.isValidEmail(user.getEmail())) {

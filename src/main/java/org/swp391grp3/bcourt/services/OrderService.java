@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.OrderDTO;
@@ -27,7 +28,6 @@ public class OrderService {
     private final OrderRepo orderRepo;
     private final CourtRepo courtRepo;
     private final ModelMapper modelMapper;
-
     public Order createOrder(Order order){
         String courtId = order.getCourt().getCourtId();
         Optional<Court> courtOpt = courtRepo.findById(courtId);
@@ -50,21 +50,23 @@ public class OrderService {
         order.setAmount(amountCal(order));
         return orderRepo.save(order);
     }
-
+    public Page<Order> getAllOrders(int page, int size) {
+        return orderRepo.findAll(PageRequest.of(page, size));
+    }
     public Page<Order> getAllOrdersByUserId(int page, int size, String userId) {
         Sort sort = Sort.by(Sort.Order.asc("date"), Sort.Order.asc("slotStart"));
         Page<Order> orders = orderRepo.findByUser_UserId(userId, PageRequest.of(page, size, sort));
         return orders;
     }
-
     public OrderDTO orderDTOConverter(Order order){
         return modelMapper.map(order, OrderDTO.class);
     }
-
     public Page<OrderDTO> orderDTOConverter(int page, int size, Page<Order> orders){
         return orders.map(order -> modelMapper.map(order, OrderDTO.class));
     }
-
+    public Page<Order> getOrdersByCourtAndDate(String courtId, LocalDate date, int page, int size) {
+        return orderRepo.findByCourtAndBookingDate(courtId, date, PageRequest.of(page, size));
+    }
     private boolean isSlotOverlapping(Order order) {
         List<Order> existingOrders = orderRepo.findByCourtAndBookingDate(order.getCourt().getCourtId(), order.getBookingDate());
         for (Order existingOrder : existingOrders) {
@@ -74,8 +76,7 @@ public class OrderService {
         }
         return false;
     }
-
-    public void deleteOrderById(String orderId){
+    public void deleteOrder(String orderId){
         Optional<Order> existingOrderOpt = orderRepo.findById(orderId);
         if (existingOrderOpt.isPresent()) {
             orderRepo.deleteById(orderId);
@@ -83,7 +84,6 @@ public class OrderService {
             throw new IllegalArgumentException("Order not found");
         }
     }
-
     private Double amountCal(Order order) {
         double pricePerHour = order.getCourt().getPrice();
         long durationInHours = Duration.between(order.getSlotStart(), order.getSlotEnd()).toHours();

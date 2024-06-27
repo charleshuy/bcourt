@@ -20,32 +20,39 @@ public class JwtService {
         Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
     public String generateToken(User user) {
         String token = Jwts.builder()
-                .subject(user.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 24*60*60*1000))
-                .signWith(getSigninKey())
+                .setSubject(user.getUsername())
+                .claim("roleName", user.getRole().getRoleName()) // Adding roleId claim
+                .claim("userId", user.getUserId())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
+                .signWith(getSigningKey())
                 .compact();
         return token;
     }
-    private SecretKey getSigninKey() {
+
+    private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64URL.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-    private Claims extractAllClaims(String token){
+
+    private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigninKey())
+                .verifyWith(getSigningKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)
+                .getBody();
     }
-    public boolean isValid(String token, UserDetails user){
+
+    public boolean isValid(String token, UserDetails user) {
         String email = extractUsername(token);
-        return email.equals(user.getUsername())&& !isTokenExpired(token);
+        return email.equals(user.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -55,5 +62,4 @@ public class JwtService {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-
 }

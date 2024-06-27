@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentMethodDTO {
-    private String methodId;
-    private String methodName;
-    private String name;
+public class LocationDTO {
+    private String locationId;
+    private String address;
+    private DistrictDTO district;
 }

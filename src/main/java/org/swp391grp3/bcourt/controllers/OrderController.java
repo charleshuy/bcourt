@@ -10,6 +10,8 @@ import org.swp391grp3.bcourt.entities.Order;
 import org.swp391grp3.bcourt.services.OrderService;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/orders")
@@ -21,6 +23,12 @@ public class OrderController {
         Order createOrder = service.createOrder(order);
         URI location = URI.create("/orders/" + createOrder.getOrderId());
         return ResponseEntity.created(location).body(service.orderDTOConverter(createOrder));
+    }
+    @GetMapping
+    public ResponseEntity<Page<OrderDTO>> getAllOrders(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                    @RequestParam(value = "size", defaultValue = "10") int size){
+        Page<Order> orders = service.getAllOrders(page, size);
+        return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
     }
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<OrderDTO>> getAllOrdersByUserId(@RequestParam(value = "page", defaultValue = "0") int page,
@@ -38,6 +46,19 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    @GetMapping("/court/{courtId}/date/{bookingDate}")
+    public ResponseEntity<Page<OrderDTO>> getOrdersByCourtAndDate(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                  @PathVariable String courtId,
+                                                                  @PathVariable String bookingDate) {
+        try {
+            LocalDate date = LocalDate.parse(bookingDate);
+            Page<Order> orders = service.getOrdersByCourtAndDate(courtId, date, page, size);
+            return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(null); // Handle invalid date format
         }
     }
 }
