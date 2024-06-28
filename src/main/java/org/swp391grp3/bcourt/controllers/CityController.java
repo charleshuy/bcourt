@@ -3,6 +3,7 @@ package org.swp391grp3.bcourt.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.swp391grp3.bcourt.dto.CityDTO;
 import org.swp391grp3.bcourt.entities.City;
 import org.swp391grp3.bcourt.repo.CityRepo;
 import org.swp391grp3.bcourt.services.LocationService;
@@ -24,7 +25,7 @@ public class CityController {
         return ResponseEntity.created(path).body(createdCity);
     }
     @GetMapping
-    public List<City> getAllCities() {
-        return repo.findAll();
+    public List<CityDTO> getAllCities() {
+        return service.citiesDTOList(repo.findAll()) ;
     }
 }

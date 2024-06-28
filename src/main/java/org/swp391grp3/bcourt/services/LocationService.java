@@ -20,6 +20,9 @@ import org.swp391grp3.bcourt.repo.CityRepo;
 import org.swp391grp3.bcourt.repo.DistrictRepo;
 import org.swp391grp3.bcourt.repo.LocationRepo;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
@@ -39,6 +42,13 @@ public class LocationService {
     public Page<CityDTO> citiesDTOConverter(int page, int size, Page<City> cityPage){
         return cityPage.map(city -> modelMapper.map(city, CityDTO.class));
     }
+    public List<CityDTO> citiesDTOList(List<City> cities){
+        return cities.stream().map((element) -> modelMapper.map(element, CityDTO.class)).collect(Collectors.toList());
+    }
+    public List<DistrictDTO> districtDTOList(List<District> districts){
+        return districts.stream().map((element) -> modelMapper.map(element, DistrictDTO.class)).collect(Collectors.toList());
+    }
+
     public LocationDTO locationReturnToDTO(Location location){
         return modelMapper.map(location, LocationDTO.class);
     }
