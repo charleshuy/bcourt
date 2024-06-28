@@ -6,13 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.swp391grp3.bcourt.dto.FileDTO;
 import org.swp391grp3.bcourt.dto.UserDTO;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.services.UserService;
 
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -83,4 +85,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 }

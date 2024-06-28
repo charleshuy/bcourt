@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.UserDTO;
+import org.swp391grp3.bcourt.entities.FileData;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.utils.ValidationUtil;
@@ -25,7 +26,6 @@ public class UserService {
     private final UserRepo userRepo;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
@@ -147,4 +147,11 @@ public class UserService {
         }
         return Optional.empty();
     }
+    public void updateUserImg(String userId, FileData fileData){
+        User user = userRepo.findByUserId(userId);
+        user.setFile(fileData);
+    }
+
+
+
 }

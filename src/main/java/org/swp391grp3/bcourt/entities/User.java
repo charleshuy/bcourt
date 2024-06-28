@@ -1,12 +1,10 @@
 package org.swp391grp3.bcourt.entities;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
-import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Builder
 @Getter
 @Setter
@@ -26,7 +23,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 //@JsonInclude(NON_DEFAULT)
 @Table(name = "user", schema = "bcourt", indexes = {
         @Index(name = "roleId", columnList = "roleId"),
-        @Index(name = "uniqueEmail", columnList = "email", unique = true)
+        @Index(name = "uniqueEmail", columnList = "email", unique = true),
+        @Index(name = "fileId", columnList = "fileId")
 })
 public class User implements UserDetails {
     @Id
@@ -39,7 +37,6 @@ public class User implements UserDetails {
 
     @Column(name = "password", length = 60)
     private String password;
-
 
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is mandatory")
@@ -62,6 +59,10 @@ public class User implements UserDetails {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "roleId")
     private Role role;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "fileId")
+    private FileData file;
 
     @OneToMany(mappedBy = "user")
     private Set<Court> courts = new LinkedHashSet<>();

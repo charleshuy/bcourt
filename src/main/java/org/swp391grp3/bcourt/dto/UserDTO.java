@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.swp391grp3.bcourt.entities.FileData;
 
 
 @Setter
@@ -17,5 +18,6 @@ public class UserDTO {
     private Double walletAmount;
     private String email;
     private Boolean enabled;
+    private String fileId;
     private RoleDTO role;
 }
