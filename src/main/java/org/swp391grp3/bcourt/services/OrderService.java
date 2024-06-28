@@ -86,7 +86,7 @@ public class OrderService {
         }
         return false;
     }
-    public void deleteOrder(String orderId){
+    public void deleteOrderById(String orderId){
         Optional<Order> existingOrderOpt = orderRepo.findById(orderId);
         if (existingOrderOpt.isPresent()) {
             orderRepo.deleteById(orderId);

@@ -21,16 +21,20 @@ import java.util.Optional;
 public class CourtService {
     private final CourtRepo courtRepo;
     private final ModelMapper modelMapper;
+
     public Court createCourt(Court court){
         return courtRepo.save(court);
     }
+
     public Page<Court> getAllCourt(int page, int size) {
         Page<Court> courtPage = courtRepo.findAll(PageRequest.of(page, size, Sort.by("courtName")));
         return courtPage;
     }
+
     public Page<Court> searchCourtsByName(int page, int size, String courtName){
         return courtRepo.findCourtByCourseName(courtName, PageRequest.of(page, size, Sort.by("courtName")));
     }
+
     public Page<CourtDTO> courtDTOConverter(int page, int size, Page<Court> courtPage){
         return courtPage.map(court -> modelMapper.map(court, CourtDTO.class));
     }
@@ -46,6 +50,7 @@ public class CourtService {
     public void deleteCourt(Court court){
         courtRepo.delete(court);
     }
+
     public Court updateCourt(String courtId, Court updatedCourt) {
         Optional<Court> existingCourtOpt = courtRepo.findByCourtId(courtId);
 

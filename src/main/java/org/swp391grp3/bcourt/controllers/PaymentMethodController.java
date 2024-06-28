@@ -30,7 +30,7 @@ public class PaymentMethodController {
     }
 
     @DeleteMapping("delete/{methodId}")
-    public ResponseEntity<?> deleteUser(@PathVariable String methodId) {
+    public ResponseEntity<?> deletePaymentMethod(@PathVariable String methodId) {
         try {
             service.deletePaymentMethodById(methodId);
             return ResponseEntity.noContent().build();
