@@ -6,19 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.CityDTO;
-import org.swp391grp3.bcourt.dto.CourtDTO;
 import org.swp391grp3.bcourt.dto.DistrictDTO;
-import org.swp391grp3.bcourt.dto.LocationDTO;
 import org.swp391grp3.bcourt.entities.City;
-import org.swp391grp3.bcourt.entities.Court;
 import org.swp391grp3.bcourt.entities.District;
-import org.swp391grp3.bcourt.entities.Location;
 import org.swp391grp3.bcourt.repo.CityRepo;
 import org.swp391grp3.bcourt.repo.DistrictRepo;
-import org.swp391grp3.bcourt.repo.LocationRepo;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,12 +24,8 @@ import java.util.stream.Collectors;
 public class LocationService {
     private final CityRepo cityRepo;
     private final DistrictRepo districtRepo;
-    private final LocationRepo locationRepo;
     private final ModelMapper modelMapper;
 
-    public Page<LocationDTO> locationsDTOConverter(int page, int size, Page<Location> locationPage){
-        return locationPage.map(loc -> modelMapper.map(loc, LocationDTO.class));
-    }
     public Page<DistrictDTO> districtsDTOConverter(int page, int size, Page<District> districtPage){
         return districtPage.map(dis -> modelMapper.map(dis, DistrictDTO.class));
     }
@@ -49,9 +39,6 @@ public class LocationService {
         return districts.stream().map((element) -> modelMapper.map(element, DistrictDTO.class)).collect(Collectors.toList());
     }
 
-    public LocationDTO locationReturnToDTO(Location location){
-        return modelMapper.map(location, LocationDTO.class);
-    }
     public DistrictDTO distrctReturnToDTO(District district){
         return modelMapper.map(district, DistrictDTO.class);
     }
@@ -59,19 +46,13 @@ public class LocationService {
         return modelMapper.map(city, CityDTO.class);
     }
 
-    public Location createLocation(Location location){
-        return locationRepo.save(location);
-    }
     public District createDistrict(District district){
         return districtRepo.save(district);
     }
     public City createCity(City city){
         return cityRepo.save(city);
     }
-    public Page<Location> getAllLocations(int page, int size) {
-        Page<Location> locationPage = locationRepo.findAll(PageRequest.of(page, size));
-        return locationPage;
-    }
+
     public Page<District> getAllDistricts(int page, int size) {
         return districtRepo.findAll(PageRequest.of(page, size));
     }

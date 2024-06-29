@@ -23,7 +23,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 //@JsonInclude(NON_DEFAULT)
 @Table(name = "court", schema = "bcourt", indexes = {
         @Index(name = "userId", columnList = "userId"),
-        @Index(name = "locationId", columnList = "LocationId")
+        @Index(name = "districtId", columnList = "districtId")
 })
 public class Court {
     @Id
@@ -37,13 +37,17 @@ public class Court {
     @Column(name = "img", length = 255)
     private String courtImg;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "locationId")
-    private Location location;
+
+    @Column(name = "address", length = 255)
+    private String address;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "districtId")
+    private District district;
 
     @Column(name = "price")
     private Double price;

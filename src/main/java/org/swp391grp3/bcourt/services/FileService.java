@@ -33,7 +33,8 @@ public class FileService {
 
         // Generate a unique file name
         String originalFilename = file.getOriginalFilename();
-        String fileName = getExtension(originalFilename);
+        String extension = getExtension(originalFilename);
+        String fileName = UUID.randomUUID().toString() + extension;
 
         // Construct the full file path
         String filePath = path + File.separator + fileName;

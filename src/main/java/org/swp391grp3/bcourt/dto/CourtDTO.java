@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.swp391grp3.bcourt.entities.District;
 
 @Getter
 @Setter
@@ -17,5 +18,6 @@ public class CourtDTO {
     private Boolean status;
     private String license;
     private UserDTO user;
-    private LocationDTO location;
+    private String address;
+    private DistrictDTO district;
 }

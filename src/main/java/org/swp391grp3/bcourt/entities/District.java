@@ -30,7 +30,8 @@ public class District {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "cityId")
     private City city;
-
     @OneToMany(mappedBy = "district")
-    private Set<Location> locations =  new LinkedHashSet<>();
+    private Set<Court> courts = new LinkedHashSet<>();
+
+
 }

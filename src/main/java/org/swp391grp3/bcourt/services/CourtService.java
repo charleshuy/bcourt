@@ -26,6 +26,7 @@ public class CourtService {
         return courtRepo.save(court);
     }
 
+
     public Page<Court> getAllCourt(int page, int size) {
         Page<Court> courtPage = courtRepo.findAll(PageRequest.of(page, size, Sort.by("courtName")));
         return courtPage;
@@ -65,8 +66,8 @@ public class CourtService {
         if (updatedCourt.getCourtName() != null) {
             existingCourt.setCourtName(updatedCourt.getCourtName());
         }
-        if (updatedCourt.getLocation() != null) {
-            existingCourt.setLocation(updatedCourt.getLocation());
+        if (updatedCourt.getAddress() != null) {
+            existingCourt.setAddress(updatedCourt.getAddress());
         }
         if (updatedCourt.getPrice() != null) {
             existingCourt.setPrice(updatedCourt.getPrice());
