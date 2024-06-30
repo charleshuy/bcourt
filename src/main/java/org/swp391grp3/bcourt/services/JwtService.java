@@ -30,6 +30,7 @@ public class JwtService {
                 .setSubject(user.getUsername())
                 .claim("roleName", user.getRole().getRoleName()) // Adding roleId claim
                 .claim("userId", user.getUserId())
+                .claim("assignedCourt", user.getAssignedCourt() != null ? user.getAssignedCourt().getCourtId() : null)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
                 .signWith(getSigningKey())

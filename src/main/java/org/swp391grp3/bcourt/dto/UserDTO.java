@@ -16,6 +16,10 @@ public class UserDTO {
     private String userId;
     private String name;
     private String phone;
+    private int banCount;
+    private String managerId;
+    private String assignedCourtId;
+    private String assignedCourtName;
     private Double walletAmount;
     private String email;
     private Boolean enabled;

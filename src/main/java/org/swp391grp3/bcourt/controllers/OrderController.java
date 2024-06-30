@@ -18,47 +18,102 @@ import java.time.format.DateTimeParseException;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService service;
+
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody Order order) {
-        Order createOrder = service.createOrder(order);
-        URI location = URI.create("/orders/" + createOrder.getOrderId());
-        return ResponseEntity.created(location).body(service.orderDTOConverter(createOrder));
+    public ResponseEntity<?> createOrder(@RequestBody Order order) {
+        try {
+            Order createdOrder = service.createOrder(order);
+            URI location = URI.create("/orders/" + createdOrder.getOrderId());
+            return ResponseEntity.created(location).body(service.orderDTOConverter(createdOrder));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while creating the order.");
+        }
     }
+
     @GetMapping
-    public ResponseEntity<Page<OrderDTO>> getAllOrders(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                    @RequestParam(value = "size", defaultValue = "10") int size){
-        Page<Order> orders = service.getAllOrders(page, size);
-        return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
+    public ResponseEntity<?> getAllOrders(@RequestParam(value = "page", defaultValue = "0") int page,
+                                          @RequestParam(value = "size", defaultValue = "10") int size) {
+        try {
+            Page<Order> orders = service.getAllOrders(page, size);
+            return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching orders.");
+        }
     }
+
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<OrderDTO>> getAllOrdersByUserId(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                               @RequestParam(value = "size", defaultValue = "10") int size,
-                                                               @PathVariable String userId) {
-        Page<Order> orders = service.getAllOrdersByUserId(page, size, userId);
-        return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
+    public ResponseEntity<?> getAllOrdersByUserId(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                  @PathVariable String userId) {
+        try {
+            Page<Order> orders = service.getAllOrdersByUserId(page, size, userId);
+            return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching orders by user.");
+        }
     }
+
+    @GetMapping("/court/{courtId}")
+    public ResponseEntity<?> getAllOrdersByCourtId(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                   @RequestParam(value = "size", defaultValue = "10") int size,
+                                                   @PathVariable String courtId) {
+        try {
+            Page<Order> orders = service.getOrdersByCourtId(courtId, page, size);
+            return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching orders by court.");
+        }
+    }
+
     @DeleteMapping("/delete/{orderId}")
     public ResponseEntity<?> deleteOrderById(@PathVariable String orderId) {
         try {
             service.deleteOrderById(orderId);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found.");
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the order.");
         }
     }
+
     @GetMapping("/court/{courtId}/date/{bookingDate}")
-    public ResponseEntity<Page<OrderDTO>> getOrdersByCourtAndDate(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                  @PathVariable String courtId,
-                                                                  @PathVariable String bookingDate) {
+    public ResponseEntity<?> getOrdersByCourtAndDate(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                     @RequestParam(value = "size", defaultValue = "10") int size,
+                                                     @PathVariable String courtId,
+                                                     @PathVariable String bookingDate) {
         try {
             LocalDate date = LocalDate.parse(bookingDate);
             Page<Order> orders = service.getOrdersByCourtAndDate(courtId, date, page, size);
             return ResponseEntity.ok().body(service.orderDTOConverter(page, size, orders));
         } catch (DateTimeParseException e) {
-            return ResponseEntity.badRequest().body(null); // Handle invalid date format
+            return ResponseEntity.badRequest().body("Invalid date format.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching orders by court and date.");
+        }
+    }
+
+    @PutMapping("/{orderId}")
+    public ResponseEntity<?> updateOrder(@PathVariable String orderId, @RequestBody Order updatedOrder) {
+        try {
+            Order updated = service.updateOrder(orderId, updatedOrder);
+            return ResponseEntity.ok(service.orderDTOConverter(updated));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating the order.");
+        }
+    }
+
+    @PutMapping("/cancel/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable String orderId, @RequestParam String userId) {
+        try {
+            service.cancelOrder(orderId, userId);
+            return ResponseEntity.ok("Order cancelled successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while cancelling the order.");
         }
     }
 }

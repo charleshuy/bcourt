@@ -50,7 +50,7 @@ public class AuthenticationService {
 
         return new AuthenticationResponse(token);
     }
-    public  AuthenticationResponse register(User request, HttpServletResponse response) {
+    public AuthenticationResponse register(User request, HttpServletResponse response) {
         userService.validateUserFields(request);
         request.setName(ValidationUtil.normalizeName(request.getName()));
         request.setWalletAmount(0.0);
@@ -62,20 +62,19 @@ public class AuthenticationService {
         request.setVerificationToken(UUID.randomUUID().toString()); // Generate a verification token
         Role role = roleService.getRoleById("1");
         request.setRole(role);
+        request.setBanCount(1);
         userRepo.save(request);
 
         // Send verification email
         String verificationLink = "http://localhost:8080/auth/verify?token=" + request.getVerificationToken();
         emailService.sendEmail(request.getEmail(), "Email Verification", "Click the link to verify your email: " + verificationLink);
 
-        String token = jwtService.generateToken(request);
+        // No JWT token generation here
 
-        Cookie cookie = new Cookie("user-session", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+        Cookie cookie = new Cookie("user-session", null);
+        cookie.setMaxAge(0); // Expire cookie
         response.addCookie(cookie);
 
-        return new AuthenticationResponse(token);
+        return new AuthenticationResponse("User registered successfully. Please verify your email.");
     }
 }

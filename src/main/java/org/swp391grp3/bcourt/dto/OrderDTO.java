@@ -17,7 +17,11 @@ import java.time.LocalTime;
 public class OrderDTO {
     private String orderId;
     private String userId;
+    private String userName;
+    private String userEmail;
+    private String userPhone;
     private LocalDate date;
+    private Boolean status;
     private Double amount;
     private LocalDate bookingDate;
     private LocalTime slotStart;

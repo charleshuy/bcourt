@@ -52,7 +52,7 @@ public class Order {
     private LocalTime  slotEnd;
 
     @Column(name = "status")
-    private boolean  status;
+    private Boolean  status;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "methodId")

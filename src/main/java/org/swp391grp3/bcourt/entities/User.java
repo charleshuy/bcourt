@@ -20,11 +20,11 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-//@JsonInclude(NON_DEFAULT)
 @Table(name = "user", schema = "bcourt", indexes = {
         @Index(name = "roleId", columnList = "roleId"),
         @Index(name = "uniqueEmail", columnList = "email", unique = true),
-        @Index(name = "fileId", columnList = "fileId")
+        @Index(name = "fileId", columnList = "fileId"),
+        @Index(name = "assignedCourtId", columnList = "assignedCourtId")
 })
 public class User implements UserDetails {
     @Id
@@ -39,16 +39,17 @@ public class User implements UserDetails {
     private String password;
 
     @Email(message = "Email should be valid")
-    @NotBlank(message = "Email is mandatory")
     @Column(name = "email", length = 50, unique = true)
     private String email;
 
-    @NotBlank(message = "Phone number is mandatory")
-    @Column(name = "phone", length = 10) // Changed to String with length 10
+    @Column(name = "phone", length = 10)
     private String phone;
 
     @Column(name = "walletAmount")
     private Double walletAmount;
+
+    @Column(name = "banCount")
+    private int banCount;
 
     @Column(name = "enabled")
     private Boolean enabled;
@@ -60,12 +61,23 @@ public class User implements UserDetails {
     @JoinColumn(name = "roleId")
     private Role role;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fileId")
     private FileData file;
 
     @OneToMany(mappedBy = "user")
     private Set<Court> courts = new LinkedHashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignedCourtId")
+    private Court assignedCourt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "managerId")
+    private User manager;
+
+    @OneToMany(mappedBy = "manager")
+    private Set<User> managedUsers = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<Favorite> favorites = new LinkedHashSet<>();
@@ -75,7 +87,6 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private Set<Review> reviews = new LinkedHashSet<>();
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

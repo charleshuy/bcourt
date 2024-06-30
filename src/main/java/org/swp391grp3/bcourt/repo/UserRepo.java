@@ -19,4 +19,6 @@ public interface UserRepo extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
     User findByUserId(String userId);
     Optional<User> findByVerificationToken(String verificationToken);
+    @Query("SELECT u FROM User u WHERE u.manager.userId = :managerId")
+    Page<User> findByManagerId(String managerId, Pageable pageable);
 }

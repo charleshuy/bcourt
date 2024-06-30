@@ -30,11 +30,13 @@ public class UserService {
         validateUserFields(user); // Call the validation method
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
         user.setWalletAmount(0.0);
+        user.setBanCount(0);
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         if (userRepo.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email is already in use");
         }
+        user.setEnabled(true);
         return userRepo.save(user);
     }
 
@@ -66,6 +68,9 @@ public class UserService {
         }
         if (updatedUser.getEmail() != null) {
             existingUser.setEmail(updatedUser.getEmail());
+        }
+        if (updatedUser.getAssignedCourt() != null){
+            existingUser.setAssignedCourt(updatedUser.getAssignedCourt());
         }
 
         // Validate updated user fields
@@ -152,6 +157,18 @@ public class UserService {
         user.setFile(fileData);
     }
 
+    public Page<UserDTO> getUsersByManagerId(String managerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> usersPage = userRepo.findByManagerId(managerId, pageable);
+        return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
+    }
 
+    public void disableUserIfBanned(User user) {
+        if (user.getBanCount() > 3 && user.isEnabled()) {
+            user.setEnabled(false);
+            userRepo.save(user);
+            log.info("User {} has been disabled due to ban count exceeding 3.", user.getUserId());
+        }
+    }
 
 }

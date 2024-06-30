@@ -85,5 +85,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    @GetMapping("/manager/{managerId}")
+    public ResponseEntity<Page<UserDTO>> getUsersByManagerId(
+            @PathVariable String managerId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<UserDTO> users = userService.getUsersByManagerId(managerId, page, size);
+        return ResponseEntity.ok(users);
+    }
 
 }
