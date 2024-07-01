@@ -28,10 +28,20 @@ public class FileController {
         return fileRepo.findAll();  // Adjust this to fetch and return the necessary file data
     }
     @PostMapping("/upload/{userId}")
-    public ResponseEntity<String> uploadFile(@PathVariable String userId,
+    public ResponseEntity<String> uploadFileUser(@PathVariable String userId,
                                              @RequestParam("file") MultipartFile file) {
         try {
             String fileId = fileService.uploadFileToFileSystem(file, userId);
+            return ResponseEntity.ok().body(fileId); // Return fileId or any other response
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + e.getMessage());
+        }
+    }
+    @PostMapping("/upload/court/{courtId}")
+    public ResponseEntity<String> uploadFileCourt(@PathVariable String courtId,
+                                                 @RequestParam("file") MultipartFile file) {
+        try {
+            String fileId = fileService.uploadFileCourtToFileSystem(file, courtId);
             return ResponseEntity.ok().body(fileId); // Return fileId or any other response
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + e.getMessage());

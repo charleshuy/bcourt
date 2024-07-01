@@ -15,7 +15,7 @@ public interface OrderRepo extends JpaRepository<Order, String> {
     Page<Order> findByCourt_CourtId(String courtId, Pageable pageable);
     @Query("SELECT o FROM Order o WHERE o.court.courtId = :courtId AND o.bookingDate = :bookingDate")
     List<Order> findByCourtAndBookingDate(@Param("courtId") String courtId, @Param("bookingDate") LocalDate bookingDate);
-    @Query("SELECT o FROM Order o WHERE o.status IS NULL AND o.bookingDate <= :currentDate")
+    @Query("SELECT o FROM Order o WHERE o.status IS NULL AND o.bookingDate < :currentDate")
     List<Order> findPendingOrdersPastBookingDate(@Param("currentDate") LocalDate currentDate);
     // New method for paginated results
     @Query("SELECT o FROM Order o WHERE o.court.courtId = :courtId AND o.bookingDate = :bookingDate")

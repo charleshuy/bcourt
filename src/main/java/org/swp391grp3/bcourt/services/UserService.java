@@ -164,7 +164,7 @@ public class UserService {
     }
 
     public void disableUserIfBanned(User user) {
-        if (user.getBanCount() > 3 && user.isEnabled()) {
+        if (user.getBanCount() > 4 && user.isEnabled()) {
             user.setEnabled(false);
             userRepo.save(user);
             log.info("User {} has been disabled due to ban count exceeding 3.", user.getUserId());

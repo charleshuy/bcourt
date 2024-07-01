@@ -13,11 +13,11 @@ import org.swp391grp3.bcourt.entities.District;
 public class CourtDTO {
     private String courtId;
     private String courtName;
-    private String courtImg;
     private Double price;
     private Boolean status;
     private String license;
     private UserDTO user;
     private String address;
+    private String fileId;
     private DistrictDTO district;
 }

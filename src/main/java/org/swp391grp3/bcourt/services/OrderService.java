@@ -1,5 +1,6 @@
 package org.swp391grp3.bcourt.services;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -147,6 +148,7 @@ public class OrderService {
         long durationInHours = Duration.between(order.getSlotStart(), order.getSlotEnd()).toHours();
         return pricePerHour * durationInHours;
     }
+
     @Scheduled(cron = "0 0 0 * * *") // Run at midnight every day
     public void autoCancelOrders() {
         log.info("Running auto-cancel orders task...");
@@ -159,28 +161,32 @@ public class OrderService {
 
         // Update status to cancelled for each pending order found
         for (Order order : pendingOrders) {
-            order.setStatus(false); // Assuming false represents cancelled status
+            // Check if the order status is null or pending
+            if (order.getStatus() == null) {
+                order.setStatus(false); // Assuming false represents cancelled status
 
-            // Handle user ban count increase if payment method is "Cash"
-            if ("Cash".equals(order.getMethod().getMethodName())) {
-                User user = order.getUser();
-                long daysUntilBooking = Duration.between(LocalDate.now().atStartOfDay(), order.getBookingDate().atStartOfDay()).toDays();
+                // Handle user ban count increase if payment method is "Cash"
+                if ("Cash".equals(order.getMethod().getMethodName())) {
+                    User user = order.getUser();
+                    long daysUntilBooking = Duration.between(LocalDate.now().atStartOfDay(), order.getBookingDate().atStartOfDay()).toDays();
 
-                if (daysUntilBooking < 3) {
-                    user.setBanCount(user.getBanCount() + 1);
-                    log.warn("Ban count increased for user {} due to auto-cancellation (Cash payment).", user.getUserId());
+                    if (daysUntilBooking < 3) {
+                        user.setBanCount(user.getBanCount() + 1);
+                        log.warn("Ban count increased for user {} due to auto-cancellation (Cash payment).", user.getUserId());
 
-                    // Disable user if ban count exceeds threshold
-                    userService.disableUserIfBanned(user);
+                        // Disable user if ban count exceeds threshold
+                        userService.disableUserIfBanned(user);
+                    }
                 }
-            }
 
-            orderRepo.save(order);
-            log.info("Order {} auto-cancelled.", order.getOrderId());
+                orderRepo.save(order);
+                log.info("Order {} auto-cancelled.", order.getOrderId());
+            }
         }
 
         log.info("Auto-cancel orders task completed.");
     }
+
     public void cancelOrder(String orderId, String userId) {
         Optional<Order> orderOpt = orderRepo.findById(orderId);
         if (orderOpt.isEmpty()) {
@@ -241,9 +247,5 @@ public class OrderService {
         order.setStatus(false);
         orderRepo.save(order);
     }
-
-
-
-
 
 }

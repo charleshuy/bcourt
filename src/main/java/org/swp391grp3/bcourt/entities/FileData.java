@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.LinkedHashSet;
@@ -37,4 +36,7 @@ public class FileData {
 
     //@OneToMany(mappedBy = "file")
     //private Set<User> users = new LinkedHashSet<>();
+
+    //@OneToMany(mappedBy = "file")
+    //private Set<Court> courts = new LinkedHashSet<>();
 }
