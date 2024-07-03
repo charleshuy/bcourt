@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.swp391grp3.bcourt.entities.User;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -21,4 +22,6 @@ public interface UserRepo extends JpaRepository<User, String> {
     Optional<User> findByVerificationToken(String verificationToken);
     @Query("SELECT u FROM User u WHERE u.manager.userId = :managerId")
     Page<User> findByManagerId(String managerId, Pageable pageable);
+    @Query("SELECT u FROM User u JOIN u.role r WHERE lower(r.roleName) = lower(:roleName)")
+    Page<User> getUsersByRoleName(String roleName, Pageable pageable);
 }

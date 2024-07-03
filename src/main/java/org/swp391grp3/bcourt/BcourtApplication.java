@@ -18,6 +18,7 @@ public class BcourtApplication {
 
 		// Run autoCancelOrders method after application startup
 		orderService.autoCancelOrders();
+		orderService.transferingWalletForCourtOwner();
 	}
 
 }

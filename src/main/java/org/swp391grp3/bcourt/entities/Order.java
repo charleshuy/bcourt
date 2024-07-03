@@ -54,6 +54,12 @@ public class Order {
     @Column(name = "status")
     private Boolean  status;
 
+    @Column(name = "refund")
+    private Boolean  refund;
+
+    @Column(name = "transferStatus")
+    private Boolean  transferStatus;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "methodId")
     private Paymentmethod method;

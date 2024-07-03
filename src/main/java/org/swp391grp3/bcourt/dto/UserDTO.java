@@ -18,6 +18,7 @@ public class UserDTO {
     private String phone;
     private int banCount;
     private String managerId;
+    private String managerName;
     private String assignedCourtId;
     private String assignedCourtName;
     private Double walletAmount;

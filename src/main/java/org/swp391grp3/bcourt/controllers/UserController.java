@@ -93,5 +93,19 @@ public class UserController {
         Page<UserDTO> users = userService.getUsersByManagerId(managerId, page, size);
         return ResponseEntity.ok(users);
     }
+    @GetMapping("/role/{roleName}")
+    public ResponseEntity<Page<UserDTO>> getUsersByRoleName(
+            @PathVariable(value = "roleName") String roleName,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        try {
+            Page<UserDTO> users = userService.getUsersByRoleName(roleName, page, size);
+            return ResponseEntity.ok(users);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 }

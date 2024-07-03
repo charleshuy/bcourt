@@ -8,10 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @Getter
@@ -46,6 +43,9 @@ public class User implements UserDetails {
 
     @Column(name = "walletAmount")
     private Double walletAmount;
+
+    @Column(name = "refundWallet")
+    private Double refundWallet;
 
     @Column(name = "banCount")
     private int banCount;
@@ -89,7 +89,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getRoleName()));
+        return Collections.singletonList(new SimpleGrantedAuthority(role.getRoleId()));
     }
 
     @Override

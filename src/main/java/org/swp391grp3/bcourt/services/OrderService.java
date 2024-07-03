@@ -1,6 +1,5 @@
 package org.swp391grp3.bcourt.services;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
@@ -41,6 +41,7 @@ public class OrderService {
         Court court = courtOpt.get();
         order.setCourt(court);
         order.setDate(LocalDate.now());
+        order.setTransferStatus(false);
         if (order.getSlotStart() == null || order.getSlotEnd() == null) {
             throw new IllegalArgumentException("Slot start and end times must be provided");
         }
@@ -59,6 +60,9 @@ public class OrderService {
             }
             user.setWalletAmount(user.getWalletAmount() - order.getAmount());
             userService.updateUser(user);
+            User courtOwner = order.getCourt().getUser();
+            courtOwner.setRefundWallet(courtOwner.getRefundWallet() + order.getAmount());
+            userService.updateUser(courtOwner);
         }
         return orderRepo.save(order);
     }
@@ -163,20 +167,37 @@ public class OrderService {
         for (Order order : pendingOrders) {
             // Check if the order status is null or pending
             if (order.getStatus() == null) {
-                order.setStatus(false); // Assuming false represents cancelled status
+                order.setStatus(false);
+                order.setRefund(false);
 
                 // Handle user ban count increase if payment method is "Cash"
                 if ("Cash".equals(order.getMethod().getMethodName())) {
                     User user = order.getUser();
                     long daysUntilBooking = Duration.between(LocalDate.now().atStartOfDay(), order.getBookingDate().atStartOfDay()).toDays();
 
-                    if (daysUntilBooking < 3) {
-                        user.setBanCount(user.getBanCount() + 1);
-                        log.warn("Ban count increased for user {} due to auto-cancellation (Cash payment).", user.getUserId());
+                    // Check court status to determine ban count increase
+                    if (order.getCourt().getStatus()) {
+                        if (daysUntilBooking < 3) {
+                            user.setBanCount(user.getBanCount() + 1);
+                            log.warn("Ban count increased for user {} due to auto-cancellation (Cash payment).", user.getUserId());
 
-                        // Disable user if ban count exceeds threshold
-                        userService.disableUserIfBanned(user);
+                            // Disable user if ban count exceeds threshold
+                            userService.disableUserIfBanned(user);
+                        }
+                    } else {
+                        log.info("Court {} is inactive. No ban count increase for order {}.", order.getCourt().getCourtId(), order.getOrderId());
                     }
+                } else if ("E-Wallet".equals(order.getMethod().getMethodName()) && order.getCourt().getStatus()) {
+                    User user = order.getUser();
+                    user.setWalletAmount(user.getWalletAmount() + order.getAmount());
+                    User courtOwner = order.getCourt().getUser();
+                    courtOwner.setRefundWallet(courtOwner.getRefundWallet() - order.getAmount());
+                    order.setRefund(true);
+                    userService.updateUser(courtOwner);
+                    userService.updateUser(user);
+                    log.info("Order {} auto-cancelled and fully refunded to E-Wallet user {}.", order.getOrderId(), user.getUserId());
+                } else {
+                    throw new IllegalArgumentException("Unsupported payment method for cancellation.");
                 }
 
                 orderRepo.save(order);
@@ -186,6 +207,8 @@ public class OrderService {
 
         log.info("Auto-cancel orders task completed.");
     }
+
+
 
     public void cancelOrder(String orderId, String userId) {
         Optional<Order> orderOpt = orderRepo.findById(orderId);
@@ -217,16 +240,18 @@ public class OrderService {
             double refundPercentage;
             if (daysUntilBooking >= 2) {
                 refundPercentage = 1.0; // 100% refund
-            } else if (daysUntilBooking >= 0) {
-                refundPercentage = 0.5; // 50% refund
             } else {
                 throw new IllegalArgumentException("Cannot cancel order on or after the booking date");
             }
 
             // Refund logic
+            order.setRefund(true);
             double refundAmount = order.getAmount() * refundPercentage;
+            User courtOwner = order.getCourt().getUser();
+            courtOwner.setRefundWallet(courtOwner.getRefundWallet() - refundAmount);
             user.setWalletAmount(user.getWalletAmount() + refundAmount);
             userService.updateUser(user);
+            userService.updateUser(courtOwner);
 
             log.info("Order {} cancelled and {}% refunded.", orderId, (int) (refundPercentage * 100));
 
@@ -247,5 +272,65 @@ public class OrderService {
         order.setStatus(false);
         orderRepo.save(order);
     }
+    public void deleteOrdersByCourtId(String courtId) {
+        orderRepo.deleteByCourt_CourtId(courtId);
+    }
+
+    private void refundForEWalletOrder(String orderId) {
+        Optional<Order> orderOpt = orderRepo.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new IllegalArgumentException("Order not found");
+        }
+
+        Order order = orderOpt.get();
+        if (!"E-Wallet".equals(order.getMethod().getMethodName())) {
+            throw new IllegalArgumentException("Order is not paid with E-Wallet");
+        }
+
+        User user = order.getUser();
+        user.setWalletAmount(user.getWalletAmount() + order.getAmount());
+        userService.updateUser(user);
+        updateOrder(order);
+        log.info("Order {} auto-cancelled and fully refunded to E-Wallet user {}.", order.getOrderId(), user.getUserId());
+    }
+
+    public void updateOrder(Order order){
+        orderRepo.save(order);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // Run at midnight every day
+    public void transferingWalletForCourtOwner() {
+        log.info("Running process transfers for eligible orders task...");
+
+        // Calculate the date exactly 10 days ago
+        LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
+
+        // Retrieve orders that are more than 10 days old and have transferStatus false
+        List<Order> ordersMoreThanTenDaysOld = orderRepo.findOrdersMoreThanTenDaysOld(tenDaysAgo);
+
+        // Process refunds for each court owner
+        ordersMoreThanTenDaysOld.stream()
+                .collect(Collectors.groupingBy(order -> order.getCourt().getUser()))
+                .forEach((courtOwner, orders) -> {
+                    double totalRefundAmount = orders.stream().mapToDouble(Order::getAmount).sum();
+
+                    // Transfer amount from refundWallet to walletAmount
+                    courtOwner.setRefundWallet(courtOwner.getRefundWallet() - totalRefundAmount);
+                    courtOwner.setWalletAmount(courtOwner.getWalletAmount() + totalRefundAmount);
+                    userService.updateUser(courtOwner);
+
+                    // Mark orders as refunded and update transferStatus
+                    orders.forEach(order -> {
+                        order.setTransferStatus(true);  // Update transferStatus to true
+                        orderRepo.save(order);
+                    });
+
+                    log.info("Transferred {} from refund wallet to wallet amount for court owner {}.", totalRefundAmount, courtOwner.getUserId());
+                });
+
+        log.info("Process transfers for eligible orders task completed.");
+    }
+
+
 
 }

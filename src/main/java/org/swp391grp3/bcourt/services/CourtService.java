@@ -21,12 +21,17 @@ import java.util.Optional;
 public class CourtService {
     private final CourtRepo courtRepo;
     private final ModelMapper modelMapper;
+    private final OrderService orderService;
 
     public Court createCourt(Court court){
         return courtRepo.save(court);
     }
 
 
+    public Page<Court> getAllCourtStatusTrue(int page, int size) {
+        Page<Court> courtPage = courtRepo.findAllByStatusTrue(PageRequest.of(page, size, Sort.by("courtName")));
+        return courtPage;
+    }
     public Page<Court> getAllCourt(int page, int size) {
         Page<Court> courtPage = courtRepo.findAll(PageRequest.of(page, size, Sort.by("courtName")));
         return courtPage;
@@ -80,5 +85,20 @@ public class CourtService {
         }
 
         return courtRepo.save(existingCourt);
+    }
+    public void deleteCourtByCourtId(String courtId) {
+        Optional<Court> courtToDeleteOpt = courtRepo.findByCourtId(courtId);
+
+        if (courtToDeleteOpt.isPresent()) {
+            Court courtToDelete = courtToDeleteOpt.get();
+
+            // Delete all orders associated with the court
+            orderService.deleteOrdersByCourtId(courtId);
+
+            // Now delete the court itself
+            courtRepo.delete(courtToDelete);
+        } else {
+            throw new IllegalArgumentException("Court with ID " + courtId + " not found");
+        }
     }
 }

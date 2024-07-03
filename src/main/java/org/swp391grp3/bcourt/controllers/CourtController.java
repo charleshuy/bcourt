@@ -25,6 +25,12 @@ public class CourtController {
         return ResponseEntity.created(location).body(courtService.courtReturnToDTO(createdCourt));
     }
     @GetMapping
+    public ResponseEntity<Page<CourtDTO>> getAllCourtsByStatus(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<Court> courts = courtService.getAllCourtStatusTrue(page, size);
+        return ResponseEntity.ok().body(courtService.courtDTOConverter(page, size, courts));
+    }
+    @GetMapping("/manage")
     public ResponseEntity<Page<CourtDTO>> getAllCourts(@RequestParam(value = "page", defaultValue = "0") int page,
                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<Court> courts = courtService.getAllCourt(page, size);
@@ -57,6 +63,15 @@ public class CourtController {
             return ResponseEntity.ok(updatedDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    @DeleteMapping("/delete/{courtId}")
+    public ResponseEntity<Void> deleteCourtByCourtId(@PathVariable String courtId) {
+        try {
+            courtService.deleteCourtByCourtId(courtId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

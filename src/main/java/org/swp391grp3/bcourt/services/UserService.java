@@ -29,7 +29,8 @@ public class UserService {
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
-        user.setWalletAmount(0.0);
+
+        user.setRefundWallet(0.0);
         user.setBanCount(0);
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -63,6 +64,9 @@ public class UserService {
         if (updatedUser.getWalletAmount() != null) {
             existingUser.setWalletAmount(updatedUser.getWalletAmount());
         }
+        if (updatedUser.getRefundWallet() != null) {
+            existingUser.setRefundWallet(updatedUser.getRefundWallet());
+        }
         if (updatedUser.getRole() != null) {
             existingUser.setRole(updatedUser.getRole());
         }
@@ -72,6 +76,11 @@ public class UserService {
         if (updatedUser.getAssignedCourt() != null){
             existingUser.setAssignedCourt(updatedUser.getAssignedCourt());
         }
+        if (updatedUser.getManager() != null){
+            existingUser.setManager(updatedUser.getManager());
+        }else {existingUser.setManager(null);}
+
+
 
         // Validate updated user fields
         validateUserUpdateFields(existingUser);
@@ -163,12 +172,18 @@ public class UserService {
         return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
     }
 
+
     public void disableUserIfBanned(User user) {
         if (user.getBanCount() > 4 && user.isEnabled()) {
             user.setEnabled(false);
             userRepo.save(user);
             log.info("User {} has been disabled due to ban count exceeding 3.", user.getUserId());
         }
+    }
+    public Page<UserDTO> getUsersByRoleName(String roleName, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepo.getUsersByRoleName(roleName, pageable)
+                .map(user -> modelMapper.map(user, UserDTO.class));
     }
 
 }
