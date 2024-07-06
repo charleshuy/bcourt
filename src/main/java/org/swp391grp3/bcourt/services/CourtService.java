@@ -10,8 +10,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.CourtDTO;
 import org.swp391grp3.bcourt.entities.Court;
+import org.swp391grp3.bcourt.entities.Order;
 import org.swp391grp3.bcourt.repo.CourtRepo;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -29,7 +31,7 @@ public class CourtService {
 
 
     public Page<Court> getAllCourtStatusTrue(int page, int size) {
-        Page<Court> courtPage = courtRepo.findAllByStatusTrue(PageRequest.of(page, size, Sort.by("courtName")));
+        Page<Court> courtPage = courtRepo.findAllByStatusTrueAndApprovalTrue(PageRequest.of(page, size, Sort.by("courtName")));
         return courtPage;
     }
     public Page<Court> getAllCourt(int page, int size) {
@@ -80,6 +82,9 @@ public class CourtService {
         if (updatedCourt.getStatus() != null) {
             existingCourt.setStatus(updatedCourt.getStatus());
         }
+        if (updatedCourt.getApproval() != null) {
+            existingCourt.setApproval(updatedCourt.getApproval());
+        }
         if (updatedCourt.getLicense() != null) {
             existingCourt.setLicense(updatedCourt.getLicense());
         }
@@ -92,10 +97,23 @@ public class CourtService {
         if (courtToDeleteOpt.isPresent()) {
             Court courtToDelete = courtToDeleteOpt.get();
 
-            // Delete all orders associated with the court
-            orderService.deleteOrdersByCourtId(courtId);
+            // Get all orders associated with the court
+            List<Order> ordersToDelete = orderService.getOrdersByCourtId(courtId);
+
+            // Refund orders paid via E-Wallet
+            ordersToDelete.stream()
+                    .filter(order -> "E-Wallet".equals(order.getMethod().getMethodName()))
+                    .forEach(order -> {
+                        try {
+                            orderService.refundForEWalletOrder(order.getOrderId());
+                        } catch (IllegalArgumentException e) {
+                            log.error("Error refunding order {} for court {}. Reason: {}", order.getOrderId(), courtId, e.getMessage());
+                            // Handle exception if needed, e.g., log or propagate further
+                        }
+                    });
 
             // Now delete the court itself
+            orderService.deleteOrdersByCourtId(courtId);
             courtRepo.delete(courtToDelete);
         } else {
             throw new IllegalArgumentException("Court with ID " + courtId + " not found");

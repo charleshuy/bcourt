@@ -16,5 +16,5 @@ public interface CourtRepo extends JpaRepository<Court, String> {
     Page<Court> findByUser_UserId(String userId , Pageable pageable);
     @Query("SELECT c FROM Court c WHERE lower(c.courtName) like lower(concat('%', :courtName, '%'))")
     Page<Court> findCourtByCourseName(String courtName, Pageable pageable);
-    Page<Court> findAllByStatusTrue(Pageable pageable);
+    Page<Court> findAllByStatusTrueAndApprovalTrue(Pageable pageable);
 }

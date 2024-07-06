@@ -147,6 +147,9 @@ public class OrderService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("bookingDate").descending());
         return orderRepo.findByCourt_CourtId(courtId, pageable);
     }
+    public List<Order> getOrdersByCourtId(String courtId) {
+        return orderRepo.findByCourt_CourtId(courtId);
+    }
     private Double amountCal(Order order) {
         double pricePerHour = order.getCourt().getPrice();
         long durationInHours = Duration.between(order.getSlotStart(), order.getSlotEnd()).toHours();
@@ -238,7 +241,7 @@ public class OrderService {
 
         if ("E-Wallet".equals(order.getMethod().getMethodName())) {
             double refundPercentage;
-            if (daysUntilBooking >= 2) {
+            if (daysUntilBooking >= 1) {
                 refundPercentage = 1.0; // 100% refund
             } else {
                 throw new IllegalArgumentException("Cannot cancel order on or after the booking date");
@@ -276,7 +279,7 @@ public class OrderService {
         orderRepo.deleteByCourt_CourtId(courtId);
     }
 
-    private void refundForEWalletOrder(String orderId) {
+    public void refundForEWalletOrder(String orderId) {
         Optional<Order> orderOpt = orderRepo.findById(orderId);
         if (orderOpt.isEmpty()) {
             throw new IllegalArgumentException("Order not found");

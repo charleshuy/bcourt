@@ -13,6 +13,7 @@ import java.util.List;
 public interface OrderRepo extends JpaRepository<Order, String> {
     Page<Order> findByUser_UserId(String userId, Pageable pageable);
     Page<Order> findByCourt_CourtId(String courtId, Pageable pageable);
+    List<Order> findByCourt_CourtId(String courtId);
     @Query("SELECT o FROM Order o WHERE o.court.courtId = :courtId AND o.bookingDate = :bookingDate")
     List<Order> findByCourtAndBookingDate(@Param("courtId") String courtId, @Param("bookingDate") LocalDate bookingDate);
     @Query("SELECT o FROM Order o WHERE o.status IS NULL AND o.bookingDate < :currentDate")

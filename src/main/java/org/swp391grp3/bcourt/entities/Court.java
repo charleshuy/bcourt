@@ -56,6 +56,9 @@ public class Court {
     @Column(name = "status")
     private Boolean status;
 
+    @Column(name = "approval")
+    private Boolean approval;
+
     @Column(name = "license", length = 50)
     private String license;
 

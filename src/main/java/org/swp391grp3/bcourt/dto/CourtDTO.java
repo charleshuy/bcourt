@@ -15,6 +15,7 @@ public class CourtDTO {
     private String courtName;
     private Double price;
     private Boolean status;
+    private Boolean approval;
     private String license;
     private UserDTO user;
     private String address;
