@@ -88,6 +88,23 @@ public class UserService {
         return userRepo.save(existingUser);
     }
 
+    public void updatePassword(User updatedUser, String oldPassword){
+        String userId = updatedUser.getUserId();
+        Optional<User> existingUserOpt = userRepo.findById(userId);
+
+        if (!existingUserOpt.isPresent()) {
+            log.error("User with ID {} not found", userId);
+            throw new RuntimeException("User not found");
+        }
+        User existingUser = existingUserOpt.get();
+        if (!ValidationUtil.isValidPassword(updatedUser.getPassword())) {
+            throw new IllegalArgumentException("Password must be 8-16 characters long");
+        }
+        String encodedPassword = passwordEncoder.encode(updatedUser.getPassword());
+        existingUser.setPassword(encodedPassword);
+        userRepo.save(existingUser);
+    }
+
     public UserDTO userReturnToDTO(User user) {
         UserDTO updatedDTO = modelMapper.map(user, UserDTO.class);
         return updatedDTO;

@@ -16,6 +16,7 @@ public interface UserRepo extends JpaRepository<User, String> {
     boolean existsByEmail(String email);
     @Query("SELECT u FROM User u WHERE lower(u.name) like lower(concat('%', :userName, '%'))")
     Page<User> searchUserByName(String userName, Pageable pageable);
+    Optional<User> findByResetToken(String resetToken);
     //Page<User> findByNameContains()
     Optional<User> findByEmail(String email);
     User findByUserId(String userId);
@@ -24,4 +25,5 @@ public interface UserRepo extends JpaRepository<User, String> {
     Page<User> findByManagerId(String managerId, Pageable pageable);
     @Query("SELECT u FROM User u JOIN u.role r WHERE lower(r.roleName) = lower(:roleName)")
     Page<User> getUsersByRoleName(String roleName, Pageable pageable);
+
 }

@@ -56,6 +56,9 @@ public class User implements UserDetails {
     @Column(name = "verificationToken")
     private String verificationToken;
 
+    @Column(name = "resetToken")
+    private String resetToken;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "roleId")
     private Role role;

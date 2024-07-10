@@ -77,4 +77,31 @@ public class AuthenticationService {
 
         return new AuthenticationResponse("User registered successfully. Please verify your email.");
     }
+
+    public void initiateResetPassword(String email) {
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("User not found with the provided email");
+        }
+
+        User user = optionalUser.get();
+        String resetToken = UUID.randomUUID().toString();
+        user.setResetToken(resetToken);
+        userRepo.save(user);
+
+        String resetLink = "http://localhost:8080/auth/reset-password?token=" + resetToken;
+        emailService.sendEmail(user.getEmail(), "Password Reset Request", "Click the link to reset your password: " + resetLink);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        Optional<User> optionalUser = userRepo.findByResetToken(token);
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("Invalid reset token");
+        }
+
+        User user = optionalUser.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null); // Clear the reset token
+        userRepo.save(user);
+    }
 }
