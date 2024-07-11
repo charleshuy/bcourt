@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req -> req.requestMatchers("/auth/**", "/courts/**", "/orders/**"
                                 , "/payment-methods/**", "/roles/**", "/users/**"
-                                , "/locations/**", "/cities/**", "/districts/**", "/files/**")
+                                , "/locations/**", "/cities/**", "/districts/**", "/files/**", "/wallet/**","/wallet/paymentReturn/vnpay-payment")
                                 .permitAll().anyRequest().authenticated()
                 ).userDetailsService(userDetailsService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

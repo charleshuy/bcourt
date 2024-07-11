@@ -76,6 +76,9 @@ public class CourtService {
         if (updatedCourt.getAddress() != null) {
             existingCourt.setAddress(updatedCourt.getAddress());
         }
+        if (updatedCourt.getDistrict() != null) {
+            existingCourt.setDistrict(updatedCourt.getDistrict());
+        }
         if (updatedCourt.getPrice() != null) {
             existingCourt.setPrice(updatedCourt.getPrice());
         }
