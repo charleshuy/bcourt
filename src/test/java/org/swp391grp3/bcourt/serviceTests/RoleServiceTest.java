@@ -1,35 +1,26 @@
 package org.swp391grp3.bcourt.serviceTests;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
 import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.repo.RoleRepo;
 import org.swp391grp3.bcourt.services.RoleService;
-
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class RoleServiceTest {
-    @Mock
-    private ModelMapper modelMapper;
 
     @Mock
     private RoleRepo roleRepo;
 
     @InjectMocks
     private RoleService roleService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void createRole_Success() {

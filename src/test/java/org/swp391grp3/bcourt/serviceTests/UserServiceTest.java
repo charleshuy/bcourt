@@ -1,41 +1,39 @@
 package org.swp391grp3.bcourt.serviceTests;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.services.UserService;
-import org.swp391grp3.bcourt.utils.ValidationUtil;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @Mock
     private UserRepo userRepo;
 
     @InjectMocks
     private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
+    private User user;
     @Test
     void createUser_whenValidUser_shouldSaveUser() {
         User user = new User();
         user.setEmail("test@example.com");
+        user.setPassword("12345678");
         user.setPhone("1234567890");
+        user.setName("John Doe");
 
         when(userRepo.existsByEmail(user.getEmail())).thenReturn(false);
         when(userRepo.save(user)).thenReturn(user);
@@ -51,11 +49,21 @@ class UserServiceTest {
     void createUser_whenEmailAlreadyExists_shouldThrowException() {
         User user = new User();
         user.setEmail("test@example.com");
+        user.setPassword("12345678");
+        user.setPhone("1234567890");
+        user.setName("Test User");
 
+        // Mocking the repository call to check if the email exists
         when(userRepo.existsByEmail(user.getEmail())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(user));
+        // Assert that createUser method throws IllegalArgumentException
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> userService.createUser(user));
+
+        // Optionally, assert on the exception message or other details
+        assertEquals("Email is already in use", thrown.getMessage()); // Adjust message as needed
     }
+
+
     @Test
     public void getAllUsers_whenValidRequest_shouldReturnUsersPage() {
         int page = 0;
@@ -72,25 +80,26 @@ class UserServiceTest {
         Page<User> result = userService.getAllUsers(page, size);
 
         assertEquals(usersPage, result);
-        verify(userRepo, times(1)).findAll(PageRequest.of(page, size, Sort.by("name")));
+        verify(userRepo, times(1)).findAll(PageRequest.of(page, size));
     }
 
     @Test
     void updateUser_whenValidUser_shouldUpdateUser() {
         String userId = "1";
         User existingUser = new User();
-        existingUser.setEmail("old@example.com");
+        existingUser.setUserId(userId);
+        existingUser.setName("John Doe");
         User updatedUser = new User();
-        updatedUser.setEmail("new@example.com");
+        updatedUser.setUserId(userId);
+        updatedUser.setName("Roland");
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(existingUser));
-        when(userRepo.existsByEmail(updatedUser.getEmail())).thenReturn(false);
         when(userRepo.save(existingUser)).thenReturn(updatedUser); // Return the updated user after save
 
-        User result = userService.updateUser( updatedUser);
+        User result = userService.updateUser(updatedUser);
 
         assertNotNull(result);
-        assertEquals(updatedUser.getEmail(), result.getEmail());
+        assertEquals(updatedUser.getName(), result.getName());
         verify(userRepo, times(1)).findById(userId);
         verify(userRepo, times(1)).save(existingUser);
     }
@@ -114,10 +123,8 @@ class UserServiceTest {
         User existingUser = new User();
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(existingUser));
-        doNothing().when(userRepo).deleteById(userId);
 
         userService.deleteUserById(userId);
-
         verify(userRepo, times(1)).deleteById(userId);
     }
 
@@ -128,5 +135,6 @@ class UserServiceTest {
         when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> userService.deleteUserById(userId));
+
     }
 }

@@ -14,16 +14,11 @@ import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.services.*;
-import org.swp391grp3.bcourt.utils.ValidationUtil;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -86,19 +81,30 @@ class AuthenticationServiceTest {
 
     @Test
     void testRegister() {
+        // Arrange
         when(userRepo.existsByEmail(user.getEmail())).thenReturn(false);
         when(passwordEncoder.encode(user.getPassword())).thenReturn("encoded-password");
-        when(jwtService.generateToken(user)).thenReturn(token);
-        when(roleService.getRoleById("1")).thenReturn(new Role());
+        Role role = new Role();
+        when(roleService.getRoleById("1")).thenReturn(role);
 
+        // Act
         AuthenticationResponse authResponse = authenticationService.register(user, response);
 
+        // Assert
         assertNotNull(authResponse);
-        assertEquals(token, authResponse.getToken());
+        assertEquals("User registered successfully. Please verify your email.", authResponse.getToken());
+
         verify(userRepo).save(user);
-        verify(emailService).sendEmail(eq(user.getEmail()), anyString(), anyString());
+        verify(emailService).sendEmail(eq(user.getEmail()), eq("Email Verification"), anyString());
         verify(response).addCookie(any(Cookie.class));
+
+        // Verify changes in user object
+        assertFalse(user.isEnabled());
+        assertNotNull(user.getVerificationToken());
+        assertEquals(role, user.getRole());
+        assertEquals(1, user.getBanCount());
     }
+
 
     // Additional tests for exception scenarios can be added here.
 }
