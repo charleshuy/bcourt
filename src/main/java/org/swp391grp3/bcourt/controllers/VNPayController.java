@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.swp391grp3.bcourt.configs.VNPayService;
+import org.swp391grp3.bcourt.configs.payment.VNPayService;
 
 @org.springframework.stereotype.Controller
 public class VNPayController {

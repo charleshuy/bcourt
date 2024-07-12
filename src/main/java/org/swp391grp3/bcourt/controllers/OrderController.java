@@ -116,4 +116,15 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while cancelling the order.");
         }
     }
+    @PutMapping("/refund/{orderId}")
+    public ResponseEntity<?> refundForEWalletOrder(@PathVariable String orderId) {
+        try {
+            service.refundForEWalletOrder(orderId);
+            return ResponseEntity.ok("Order refunded successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the refund.");
+        }
+    }
 }

@@ -22,6 +22,7 @@ public class UserDTO {
     private String assignedCourtId;
     private String assignedCourtName;
     private Double walletAmount;
+    private Double refundWallet;
     private String email;
     private Boolean enabled;
     private String fileId;

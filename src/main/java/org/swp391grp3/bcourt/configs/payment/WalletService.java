@@ -1,6 +1,5 @@
-package org.swp391grp3.bcourt.configs;
+package org.swp391grp3.bcourt.configs.payment;
 
-import org.swp391grp3.bcourt.configs.VNPayService;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;

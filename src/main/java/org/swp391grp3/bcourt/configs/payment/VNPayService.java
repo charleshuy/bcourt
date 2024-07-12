@@ -1,4 +1,4 @@
-package org.swp391grp3.bcourt.configs;
+package org.swp391grp3.bcourt.configs.payment;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;

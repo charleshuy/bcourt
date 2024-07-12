@@ -3,11 +3,10 @@ package org.swp391grp3.bcourt.controllers;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.swp391grp3.bcourt.configs.WalletService;
+import org.swp391grp3.bcourt.configs.payment.WalletService;
 
 import java.io.IOException;
 

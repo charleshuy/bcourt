@@ -259,7 +259,7 @@ public class OrderService {
             log.info("Order {} cancelled and {}% refunded.", orderId, (int) (refundPercentage * 100));
 
         } else if ("Cash".equals(order.getMethod().getMethodName())) {
-            if (daysUntilBooking < 3) {
+            if (daysUntilBooking > 2) {
                 user.setBanCount(user.getBanCount() + 1);
                 log.warn("Ban count increased for user {} due to late cancellation.", userId);
 
@@ -292,9 +292,19 @@ public class OrderService {
 
         User user = order.getUser();
         user.setWalletAmount(user.getWalletAmount() + order.getAmount());
-        userService.updateUser(user);
-        updateOrder(order);
-        log.info("Order {} auto-cancelled and fully refunded to E-Wallet user {}.", order.getOrderId(), user.getUserId());
+        User courtOwner = order.getCourt().getUser();
+        courtOwner.setRefundWallet(courtOwner.getRefundWallet() - order.getAmount());
+        if(courtOwner.getWalletAmount() >= 0){
+            userService.updateUser(user);
+            userService.updateUser(courtOwner);
+            order.setStatus(false);
+            order.setRefund(true);
+            updateOrder(order);
+            log.info("Order {} cancelled and fully refunded to E-Wallet user {}.", order.getOrderId(), user.getUserId());
+        }else {
+            throw new IllegalArgumentException("Manager doesn't have enough money in E-Wallet.");
+        }
+
     }
 
     public void updateOrder(Order order){
