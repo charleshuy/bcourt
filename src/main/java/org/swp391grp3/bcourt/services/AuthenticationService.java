@@ -62,12 +62,13 @@ public class AuthenticationService {
         request.setVerificationToken(UUID.randomUUID().toString()); // Generate a verification token
         Role role = roleService.getRoleById("1");
         request.setRole(role);
-        request.setBanCount(1);
+        request.setBanCount(0);
         userRepo.save(request);
 
         // Send verification email
         String verificationLink = "http://localhost:8080/auth/verify?token=" + request.getVerificationToken();
-        emailService.sendEmail(request.getEmail(), "Email Verification", "Click the link to verify your email: " + verificationLink);
+        String emailContent = "Click <a href=\"" + verificationLink + "\">here</a> to verify your email.";
+        emailService.sendEmail(request.getEmail(), "Email Verification", emailContent);
 
         // No JWT token generation here
 

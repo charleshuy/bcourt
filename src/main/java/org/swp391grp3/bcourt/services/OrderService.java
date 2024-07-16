@@ -48,6 +48,9 @@ public class OrderService {
         if (order.getSlotStart().isAfter(order.getSlotEnd()) || order.getSlotStart().equals(order.getSlotEnd())) {
             throw new IllegalArgumentException("Slot start time must be before slot end time");
         }
+        if (order.getBookingDate() == null) {
+            throw new IllegalArgumentException("Need Booking Date");
+        }
 
         if (isSlotOverlapping(order)) {
             throw new IllegalArgumentException("Time slot overlaps with an existing order");
@@ -243,6 +246,8 @@ public class OrderService {
             double refundPercentage;
             if (daysUntilBooking >= 1) {
                 refundPercentage = 1.0; // 100% refund
+            } else if (daysUntilBooking == 0) {
+                refundPercentage = 0.0; // No refund
             } else {
                 throw new IllegalArgumentException("Cannot cancel order on or after the booking date");
             }
@@ -259,7 +264,7 @@ public class OrderService {
             log.info("Order {} cancelled and {}% refunded.", orderId, (int) (refundPercentage * 100));
 
         } else if ("Cash".equals(order.getMethod().getMethodName())) {
-            if (daysUntilBooking > 2) {
+            if (daysUntilBooking < 2) {
                 user.setBanCount(user.getBanCount() + 1);
                 log.warn("Ban count increased for user {} due to late cancellation.", userId);
 

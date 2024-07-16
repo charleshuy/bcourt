@@ -10,8 +10,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.CourtDTO;
 import org.swp391grp3.bcourt.entities.Court;
+import org.swp391grp3.bcourt.entities.FileData;
 import org.swp391grp3.bcourt.entities.Order;
+import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.CourtRepo;
+import org.swp391grp3.bcourt.repo.FileRepo;
+import org.swp391grp3.bcourt.repo.UserRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +25,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class CourtService {
+    private final UserRepo userRepo;
     private final CourtRepo courtRepo;
     private final ModelMapper modelMapper;
     private final OrderService orderService;
+    private final FileRepo fileRepo;
+    private final FileService fileService;
 
     public Court createCourt(Court court){
         return courtRepo.save(court);
@@ -56,6 +63,7 @@ public class CourtService {
     }
 
     public void deleteCourt(Court court){
+
         courtRepo.delete(court);
     }
 
@@ -100,6 +108,7 @@ public class CourtService {
         if (courtToDeleteOpt.isPresent()) {
             Court courtToDelete = courtToDeleteOpt.get();
 
+
             // Get all orders associated with the court
             List<Order> ordersToDelete = orderService.getOrdersByCourtId(courtId);
 
@@ -114,7 +123,12 @@ public class CourtService {
                             // Handle exception if needed, e.g., log or propagate further
                         }
                     });
-
+            List<User> users = userRepo.findByAssignedCourt_CourtId(courtId);
+            for(User u : users){
+                u.setAssignedCourt(null);
+            }
+            FileData oldFileData = courtToDelete.getFile();
+            fileService.deleteOldFile(oldFileData);
             // Now delete the court itself
             orderService.deleteOrdersByCourtId(courtId);
             courtRepo.delete(courtToDelete);

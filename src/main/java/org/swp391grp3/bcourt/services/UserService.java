@@ -10,11 +10,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.UserDTO;
+import org.swp391grp3.bcourt.entities.Court;
 import org.swp391grp3.bcourt.entities.FileData;
+import org.swp391grp3.bcourt.entities.Order;
 import org.swp391grp3.bcourt.entities.User;
+import org.swp391grp3.bcourt.repo.CourtRepo;
+import org.swp391grp3.bcourt.repo.OrderRepo;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.utils.ValidationUtil;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -22,10 +27,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class UserService {
+    private final OrderRepo orderRepo;
 
     private final UserRepo userRepo;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final CourtRepo courtRepo;
+    private final FileService fileService;
+
     public User createUser(User user) {
         validateUserFields(user); // Call the validation method
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
@@ -69,6 +78,14 @@ public class UserService {
         }
         if (updatedUser.getRole() != null) {
             existingUser.setRole(updatedUser.getRole());
+
+            // If the role is not "staff", set manager to null
+            if (!updatedUser.getRole().getRoleId().equalsIgnoreCase("4")) {
+                existingUser.setManager(null);
+            } else if (updatedUser.getManager() != null){
+                // Update the manager if the role is "staff"
+                existingUser.setManager(updatedUser.getManager());
+            }
         }
         if (updatedUser.getEmail() != null) {
             existingUser.setEmail(updatedUser.getEmail());
@@ -76,10 +93,6 @@ public class UserService {
         if (updatedUser.getAssignedCourt() != null){
             existingUser.setAssignedCourt(updatedUser.getAssignedCourt());
         }
-        if (updatedUser.getManager() != null){
-            existingUser.setManager(updatedUser.getManager());
-        }else {existingUser.setManager(null);}
-
 
 
         // Validate updated user fields
@@ -131,6 +144,18 @@ public class UserService {
     public void deleteUserById(String userId) {
         Optional<User> existingUserOpt = userRepo.findById(userId);
         if (existingUserOpt.isPresent()) {
+            List<Court> courts = courtRepo.findByUser_UserId(userId);
+            for (Court c : courts){
+                c.setUser(null);
+            }
+            List<User> users = userRepo.findByManager_UserId(userId);
+            for(User u : users){
+                u.setManager(null);
+            }
+            List<Order> orders = orderRepo.findByUser_UserId(userId);
+            orderRepo.deleteAll(orders);
+            User user = existingUserOpt.get();
+            fileService.deleteOldFile(user.getFile());
             userRepo.deleteById(userId);
         } else {
             throw new IllegalArgumentException("User not found");

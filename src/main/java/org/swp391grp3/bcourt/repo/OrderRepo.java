@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface OrderRepo extends JpaRepository<Order, String> {
     Page<Order> findByUser_UserId(String userId, Pageable pageable);
+    List<Order> findByUser_UserId(String userId);
     Page<Order> findByCourt_CourtId(String courtId, Pageable pageable);
     List<Order> findByCourt_CourtId(String courtId);
     @Query("SELECT o FROM Order o WHERE o.court.courtId = :courtId AND o.bookingDate = :bookingDate")
@@ -22,6 +23,6 @@ public interface OrderRepo extends JpaRepository<Order, String> {
     @Query("SELECT o FROM Order o WHERE o.court.courtId = :courtId AND o.bookingDate = :bookingDate")
     Page<Order> findByCourtAndBookingDate(@Param("courtId") String courtId, @Param("bookingDate") LocalDate bookingDate, Pageable pageable);
     void deleteByCourt_CourtId(String courtId);
-    @Query("SELECT o FROM Order o WHERE o.bookingDate < :tenDaysAgo AND (o.status = true OR o.refund = false) AND o.method.methodName = 'E-Wallet' AND o.transferStatus = false")
+    @Query("SELECT o FROM Order o WHERE o.bookingDate < :tenDaysAgo AND (o.status = true OR o.refund != true) AND o.method.methodName = 'E-Wallet' AND o.transferStatus != true")
     List<Order> findOrdersMoreThanTenDaysOld(@Param("tenDaysAgo") LocalDate tenDaysAgo);
 }

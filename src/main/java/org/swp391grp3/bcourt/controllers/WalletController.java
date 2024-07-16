@@ -3,6 +3,7 @@ package org.swp391grp3.bcourt.controllers;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,11 @@ public class WalletController {
 
     @Autowired
     private WalletService walletService;
+    @Value("${react.app.success.url}")
+    private String successUrl;
+
+    @Value("${react.app.error.url}")
+    private String errorUrl;
 
     @PostMapping("deposit")
     public String deposit(@RequestParam("userId") String userId,
@@ -25,8 +31,7 @@ public class WalletController {
                           HttpServletRequest request) {
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         String returnUrl = baseUrl + "/wallet/paymentReturn";
-        String vnpayUrl = walletService.initiateDeposit(userId, amount, orderInfo, returnUrl);
-        return  vnpayUrl;
+        return walletService.initiateDeposit(userId, amount, orderInfo, returnUrl);
     }
 
     @GetMapping("/paymentReturn")
@@ -34,10 +39,10 @@ public class WalletController {
         boolean success = walletService.handlePaymentReturn(request);
         if (success) {
             // Redirect to your React app
-            response.sendRedirect("http://localhost:5173/success");  // Redirect to the root URL of your React app
+            response.sendRedirect(successUrl);  // Redirect to the root URL of your React app
         } else {
             // Handle failure redirection as needed
-            response.sendRedirect("http://localhost:5173/error"); // Redirect to an error page
+            response.sendRedirect(errorUrl); // Redirect to an error page
         }
     }
 }

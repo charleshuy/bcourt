@@ -14,6 +14,7 @@ import org.swp391grp3.bcourt.services.AuthenticationService;
 import org.swp391grp3.bcourt.services.RoleService;
 import org.swp391grp3.bcourt.services.UserService;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -46,10 +47,11 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+    public void verifyEmail(@RequestParam("token") String token, HttpServletResponse response) throws IOException, IOException {
         Optional<User> userOptional = userRepo.findByVerificationToken(token);
         if (!userOptional.isPresent()) {
-            return ResponseEntity.badRequest().body("Invalid verification token");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid verification token");
+            return;
         }
 
         User user = userOptional.get();
@@ -57,7 +59,7 @@ public class AuthController {
         user.setVerificationToken(null);
         userRepo.save(user);
 
-        return ResponseEntity.ok("Email verified successfully");
+        response.sendRedirect("http://localhost:5173/verify/success");
     }
 
     @PostMapping("/initiate-reset-password")
