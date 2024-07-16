@@ -11,6 +11,7 @@ import org.swp391grp3.bcourt.entities.FileData;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.CourtRepo;
 import org.swp391grp3.bcourt.repo.FileRepo;
+import org.swp391grp3.bcourt.repo.UserRepo;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.UUID;
 public class FileService {
 
     private final FileRepo fileRepo;
-    private final UserService userService;
+    private final UserRepo userRepo;
     private final CourtRepo courtRepo;
 
     @Value("${file.upload.path}") // Injecting property from application.properties
@@ -37,25 +38,13 @@ public class FileService {
         }
 
         // Retrieve the user's current profile photo (if exists)
-        User user = userService.getUserById(userId);
+        User user = userRepo.findByUserId(userId);
         if (user == null) {
             throw new IllegalArgumentException("User not found with userId: " + userId);
         }
 
         FileData oldFileData = user.getFile();
-        if (oldFileData != null) {
-            // Delete the old file from the file system
-            String oldFilePath = oldFileData.getFileUrl();
-            File oldFile = new File(oldFilePath);
-            if (oldFile.exists()) {
-                boolean deleted = oldFile.delete();
-                if (!deleted) {
-                    log.warn("Failed to delete old file: {}", oldFilePath);
-                }
-            }
-            // Delete old file metadata from database
-            fileRepo.delete(oldFileData);
-        }
+        deleteOldFile(oldFileData);
 
         // Generate a unique file name for the new file
         String originalFilename = file.getOriginalFilename();
@@ -78,7 +67,7 @@ public class FileService {
 
             // Update user's profile photo (assuming userId is used as fileId)
             user.setFile(savedFileData); // Update user's file reference
-            userService.updateUserImg(userId, savedFileData);
+            userRepo.save(user);
 
             return savedFileData.getFileId();
         } catch (IOException e) {
@@ -86,17 +75,7 @@ public class FileService {
             throw e; // Rethrow the exception or handle accordingly
         }
     }
-
-    public String uploadFileCourtToFileSystem(MultipartFile file, String courtId) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
-        }
-
-        // Retrieve the court by courtId
-        Optional<Court> optionalCourt = courtRepo.findByCourtId(courtId);
-        Court court = optionalCourt.orElseThrow(() -> new IllegalArgumentException("Court not found with courtId: " + courtId));
-
-        FileData oldFileData = court.getFile();
+    public void deleteOldFile(FileData oldFileData){
         if (oldFileData != null) {
             // Delete the old file from the file system
             String oldFilePath = oldFileData.getFileUrl();
@@ -110,6 +89,40 @@ public class FileService {
             // Delete old file metadata from database
             fileRepo.delete(oldFileData);
         }
+    }
+    public void deleteFile(String fileId) {
+        Optional<FileData> fileDataOptional = fileRepo.findById(fileId);
+        if (fileDataOptional.isPresent()) {
+            FileData fileData = fileDataOptional.get();
+
+            // Delete the file from the file system
+            String filePath = fileData.getFileUrl();
+            File file = new File(filePath);
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (!deleted) {
+                    log.warn("Failed to delete file: {}", filePath);
+                }
+            }
+
+            // Delete the file metadata from the database
+            fileRepo.delete(fileData);
+        } else {
+            throw new IllegalArgumentException("File not found with fileId: " + fileId);
+        }
+    }
+
+    public String uploadFileCourtToFileSystem(MultipartFile file, String courtId) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        // Retrieve the court by courtId
+        Optional<Court> optionalCourt = courtRepo.findByCourtId(courtId);
+        Court court = optionalCourt.orElseThrow(() -> new IllegalArgumentException("Court not found with courtId: " + courtId));
+
+        FileData oldFileData = court.getFile();
+        deleteOldFile(oldFileData);
 
         // Generate a unique file name for the new file
         String originalFilename = file.getOriginalFilename();

@@ -38,7 +38,7 @@ public class Court {
     @Column(name = "address", length = 255)
     private String address;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
 

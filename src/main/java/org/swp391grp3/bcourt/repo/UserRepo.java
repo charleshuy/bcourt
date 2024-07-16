@@ -25,5 +25,7 @@ public interface UserRepo extends JpaRepository<User, String> {
     Page<User> findByManagerId(String managerId, Pageable pageable);
     @Query("SELECT u FROM User u JOIN u.role r WHERE lower(r.roleName) = lower(:roleName)")
     Page<User> getUsersByRoleName(String roleName, Pageable pageable);
+    List<User> findByManager_UserId(String userId);
+    List<User> findByAssignedCourt_CourtId(String courtId);
 
 }
