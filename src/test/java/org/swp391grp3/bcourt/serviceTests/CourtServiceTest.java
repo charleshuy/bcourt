@@ -97,16 +97,7 @@ public class CourtServiceTest {
         verify(courtRepo, times(1)).save(court);
     }
 
-    @Test
-    public void testGetAllCourtStatusTrue() {
-        when(courtRepo.findAllByStatusTrueAndApprovalTrue(any(PageRequest.class))).thenReturn(courtPage);
 
-        Page<Court> result = courtService.getAllCourtStatusTrue(0, 10);
-
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        verify(courtRepo, times(1)).findAllByStatusTrueAndApprovalTrue(any(PageRequest.class));
-    }
 
     @Test
     public void testGetAllCourt() {

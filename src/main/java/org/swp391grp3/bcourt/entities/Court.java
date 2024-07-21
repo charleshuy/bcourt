@@ -2,6 +2,9 @@ package org.swp391grp3.bcourt.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,9 +35,11 @@ public class Court {
     @Column(name = "courtId", nullable = false, updatable = false, length = 36)
     private String courtId;
 
-    @Column(name = "courtName", length = 50)
+    @NotBlank(message = "Court name can't be blank.")
+    @Column(name = "courtName", nullable = false, length = 50)
     private String courtName;
 
+    @NotBlank(message = "Address can't be blank.")
     @Column(name = "address", length = 255)
     private String address;
 
@@ -50,6 +55,8 @@ public class Court {
     @JoinColumn(name = "fileId")
     private FileData file;
 
+    @Min(value = 0, message = "Price must be greater than 0.")
+    @NotNull(message = "Please add price")
     @Column(name = "price")
     private Double price;
 
