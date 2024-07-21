@@ -41,6 +41,7 @@ public class UserService {
         user.setName(ValidationUtil.normalizeName(user.getName())); // Normalize the name
 
         user.setRefundWallet(0.0);
+        user.setWalletAmount(0.0);
         user.setBanCount(0);
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -125,7 +126,8 @@ public class UserService {
     }
 
     public Page<User> getAllUsers(int page, int size) {
-        return userRepo.findAll(PageRequest.of(page, size));
+
+        return userRepo.findAll(PageRequest.of(page, size, Sort.by("name")));
     }
 
     public Page<UserDTO> pageUserDTO(Page<User> userPage){

@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.OrderDTO;
 import org.swp391grp3.bcourt.entities.Court;
 import org.swp391grp3.bcourt.entities.Order;
+import org.swp391grp3.bcourt.entities.Paymentmethod;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.CourtRepo;
 import org.swp391grp3.bcourt.repo.OrderRepo;
+import org.swp391grp3.bcourt.repo.PaymentRepo;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -32,13 +34,18 @@ public class OrderService {
     private final CourtRepo courtRepo;
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final PaymentRepo paymentRepo;
+
     public Order createOrder(Order order){
         String courtId = order.getCourt().getCourtId();
         Optional<Court> courtOpt = courtRepo.findById(courtId);
-        if (!courtOpt.isPresent()) {
+        if (courtOpt.isEmpty()) {
             throw new IllegalArgumentException("Court not found");
         }
         Court court = courtOpt.get();
+        Optional<Paymentmethod> paymentmethod = paymentRepo.findById(order.getMethod().getMethodId());
+
+        Paymentmethod p = paymentmethod.get();
         order.setCourt(court);
         order.setDate(LocalDate.now());
         order.setTransferStatus(false);
@@ -56,7 +63,7 @@ public class OrderService {
             throw new IllegalArgumentException("Time slot overlaps with an existing order");
         }
         order.setAmount(amountCal(order));
-        if ("E-Wallet".equals(order.getMethod().getMethodName())) {
+        if ("E-Wallet".equals(p.getMethodName())) {
             User user = userService.getUserById(order.getUser().getUserId());
             if (user.getWalletAmount() < order.getAmount()) {
                 throw new IllegalArgumentException("Insufficient wallet balance");
@@ -108,12 +115,11 @@ public class OrderService {
 
 
     public Page<Order> getAllOrders(int page, int size) {
-        return orderRepo.findAll(PageRequest.of(page, size));
+        return orderRepo.findAll(PageRequest.of(page, size, Sort.by("bookingDate")));
     }
     public Page<Order> getAllOrdersByUserId(int page, int size, String userId) {
-        Sort sort = Sort.by(Sort.Order.asc("date"), Sort.Order.asc("slotStart"));
-        Page<Order> orders = orderRepo.findByUser_UserId(userId, PageRequest.of(page, size, sort));
-        return orders;
+        Sort sort = Sort.by(Sort.Order.desc("bookingDate"), Sort.Order.asc("slotStart"));
+        return orderRepo.findByUser_UserId(userId, PageRequest.of(page, size, sort));
     }
     public OrderDTO orderDTOConverter(Order order){
         return modelMapper.map(order, OrderDTO.class);
@@ -122,7 +128,8 @@ public class OrderService {
         return orders.map(order -> modelMapper.map(order, OrderDTO.class));
     }
     public Page<Order> getOrdersByCourtAndDate(String courtId, LocalDate date, int page, int size) {
-        return orderRepo.findByCourtAndBookingDate(courtId, date, PageRequest.of(page, size));
+        Sort sort = Sort.by(Sort.Order.desc("bookingDate"), Sort.Order.asc("slotStart"));
+        return orderRepo.findByCourtAndBookingDate(courtId, date, PageRequest.of(page, size,sort));
     }
     private boolean isSlotOverlapping(Order order) {
         List<Order> existingOrders = orderRepo.findByCourtAndBookingDate(order.getCourt().getCourtId(), order.getBookingDate());
@@ -147,7 +154,7 @@ public class OrderService {
         }
     }
     public Page<Order> getOrdersByCourtId(String courtId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("bookingDate").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("bookingDate").ascending());
         return orderRepo.findByCourt_CourtId(courtId, pageable);
     }
     public List<Order> getOrdersByCourtId(String courtId) {

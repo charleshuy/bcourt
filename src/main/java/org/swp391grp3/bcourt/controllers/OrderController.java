@@ -108,6 +108,7 @@ public class OrderController {
     @PutMapping("/cancel/{orderId}")
     public ResponseEntity<?> cancelOrder(@PathVariable String orderId, @RequestParam String userId) {
         try {
+            System.out.println(orderId + userId);
             service.cancelOrder(orderId, userId);
             return ResponseEntity.ok("Order cancelled successfully.");
         } catch (IllegalArgumentException e) {

@@ -2,6 +2,7 @@ package org.swp391grp3.bcourt.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,9 +43,11 @@ public class User implements UserDetails {
     private String phone;
 
     @Column(name = "walletAmount")
+    @Min(value = 0, message = "E wallet must be greater than or equal to 0")
     private Double walletAmount;
 
     @Column(name = "refundWallet")
+    @Min(value = 0, message = "Refund wallet must be greater than or equal to 0")
     private Double refundWallet;
 
     @Column(name = "banCount")
