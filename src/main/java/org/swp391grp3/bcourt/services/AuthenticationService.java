@@ -48,7 +48,7 @@ public class AuthenticationService {
         cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
         response.addCookie(cookie);
 
-        return new AuthenticationResponse(token);
+        return new AuthenticationResponse(token, null);
     }
     public AuthenticationResponse register(User request, HttpServletResponse response) {
         userService.validateUserFields(request);
@@ -76,8 +76,9 @@ public class AuthenticationService {
         cookie.setMaxAge(0); // Expire cookie
         response.addCookie(cookie);
 
-        return new AuthenticationResponse("User registered successfully. Please verify your email.");
+        return new AuthenticationResponse("User registered successfully. Please verify your email.", null);
     }
+
 
     public void initiateResetPassword(String email) {
         Optional<User> optionalUser = userRepo.findByEmail(email);

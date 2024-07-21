@@ -117,10 +117,10 @@ public class LocationServiceTest {
     }
 
     @Test
-    public void testDistrctReturnToDTO() {
+    public void testDistrictReturnToDTO() {
         when(modelMapper.map(any(District.class), eq(DistrictDTO.class))).thenReturn(districtDTO);
 
-        DistrictDTO result = locationService.distrctReturnToDTO(district);
+        DistrictDTO result = locationService.districtReturnToDTO(district);
 
         assertNotNull(result);
         assertEquals(districtDTO.getDistrictId(), result.getDistrictId());
@@ -173,7 +173,7 @@ public class LocationServiceTest {
     public void testGetAllCities() {
         when(cityRepo.findAll(any(PageRequest.class))).thenReturn(cityPage);
 
-        Page<City> result = locationService.getAllCitiess(0, 10);
+        Page<City> result = locationService.getAllCities(0, 10);
 
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
