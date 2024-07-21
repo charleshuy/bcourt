@@ -7,11 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.swp391grp3.bcourt.dto.AuthenticationResponse;
 import org.swp391grp3.bcourt.dto.LoginDTO;
-import org.swp391grp3.bcourt.entities.Role;
 import org.swp391grp3.bcourt.entities.User;
 import org.swp391grp3.bcourt.repo.UserRepo;
 import org.swp391grp3.bcourt.services.AuthenticationService;
-import org.swp391grp3.bcourt.services.RoleService;
 import org.swp391grp3.bcourt.services.UserService;
 
 import java.io.IOException;
@@ -42,14 +40,21 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody User request, HttpServletResponse response){
-        return ResponseEntity.ok(authService.register(request, response));
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody User request, HttpServletResponse response) {
+        try {
+            return ResponseEntity.ok(authService.register(request, response));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new AuthenticationResponse(null, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AuthenticationResponse(null, "An unexpected error occurred. Please try again later."));
+        }
     }
+
 
     @GetMapping("/verify")
     public void verifyEmail(@RequestParam("token") String token, HttpServletResponse response) throws IOException, IOException {
         Optional<User> userOptional = userRepo.findByVerificationToken(token);
-        if (!userOptional.isPresent()) {
+        if (userOptional.isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid verification token");
             return;
         }

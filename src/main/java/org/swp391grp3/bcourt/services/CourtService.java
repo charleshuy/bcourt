@@ -37,9 +37,13 @@ public class CourtService {
     }
 
 
-    public Page<Court> getAllCourtStatusTrue(int page, int size) {
-        Page<Court> courtPage = courtRepo.findAllByStatusTrueAndApprovalTrue(PageRequest.of(page, size, Sort.by("courtName")));
-        return courtPage;
+    public Page<Court> getAllCourtStatusTrue(int page, int size, String sortBy, Sort.Direction sortOrder) {
+        // Create Sort object based on the provided parameters
+        Sort sort = Sort.by(sortOrder, sortBy);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        // Fetch sorted data from the repository
+        return courtRepo.findAllByStatusTrueAndApprovalTrue(pageRequest);
     }
     public Page<Court> getAllCourt(int page, int size) {
         Page<Court> courtPage = courtRepo.findAll(PageRequest.of(page, size, Sort.by("courtName")));
@@ -49,13 +53,25 @@ public class CourtService {
     public Page<Court> searchCourtsByName(int page, int size, String courtName){
         return courtRepo.findCourtByCourseName(courtName, PageRequest.of(page, size, Sort.by("courtName")));
     }
+    public Court getCourtByCourtId(String courtId) {
+        // Find the court by its ID
+        Optional<Court> courtOpt = courtRepo.findByCourtId(courtId);
+
+        // Check if the court is present, if not throw an exception
+        if (courtOpt.isPresent()) {
+            return courtOpt.get();
+        } else {
+            log.error("Court with ID {} not found", courtId);
+            throw new RuntimeException("Court not found");
+        }
+    }
 
     public Page<CourtDTO> courtDTOConverter(int page, int size, Page<Court> courtPage){
         return courtPage.map(court -> modelMapper.map(court, CourtDTO.class));
     }
 
     public Page<Court> getCourtByUserId(int page, int size,String userId){
-        return courtRepo.findByUser_UserId(userId, PageRequest.of(page, size));
+        return courtRepo.findByUser_UserId(userId, PageRequest.of(page, size, Sort.by("courtName")));
     }
 
     public CourtDTO courtReturnToDTO(Court court){

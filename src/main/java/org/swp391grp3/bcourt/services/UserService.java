@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.UserDTO;
@@ -55,7 +56,7 @@ public class UserService {
         String userId = updatedUser.getUserId();
         Optional<User> existingUserOpt = userRepo.findById(userId);
 
-        if (!existingUserOpt.isPresent()) {
+        if (existingUserOpt.isEmpty()) {
             log.error("User with ID {} not found", userId);
             throw new RuntimeException("User not found");
         }
@@ -105,7 +106,7 @@ public class UserService {
         String userId = updatedUser.getUserId();
         Optional<User> existingUserOpt = userRepo.findById(userId);
 
-        if (!existingUserOpt.isPresent()) {
+        if (existingUserOpt.isEmpty()) {
             log.error("User with ID {} not found", userId);
             throw new RuntimeException("User not found");
         }
@@ -209,7 +210,7 @@ public class UserService {
     }
 
     public Page<UserDTO> getUsersByManagerId(String managerId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name"));
         Page<User> usersPage = userRepo.findByManagerId(managerId, pageable);
         return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
     }

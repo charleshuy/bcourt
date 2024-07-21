@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.swp391grp3.bcourt.dto.CityDTO;
 import org.swp391grp3.bcourt.dto.DistrictDTO;
@@ -39,7 +40,7 @@ public class LocationService {
         return districts.stream().map((element) -> modelMapper.map(element, DistrictDTO.class)).collect(Collectors.toList());
     }
 
-    public DistrictDTO distrctReturnToDTO(District district){
+    public DistrictDTO districtReturnToDTO(District district){
         return modelMapper.map(district, DistrictDTO.class);
     }
     public CityDTO cityReturnToDTO(City city){
@@ -54,9 +55,9 @@ public class LocationService {
     }
 
     public Page<District> getAllDistricts(int page, int size) {
-        return districtRepo.findAll(PageRequest.of(page, size));
+        return districtRepo.findAll(PageRequest.of(page, size, Sort.by("districtName")));
     }
-    public Page<City> getAllCitiess(int page, int size) {
+    public Page<City> getAllCities(int page, int size) {
         return cityRepo.findAll(PageRequest.of(page, size));
     }
 }

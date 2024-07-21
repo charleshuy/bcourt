@@ -3,6 +3,7 @@ package org.swp391grp3.bcourt.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,21 +26,28 @@ public class CourtController {
         return ResponseEntity.created(location).body(courtService.courtReturnToDTO(createdCourt));
     }
     @GetMapping
-    public ResponseEntity<Page<CourtDTO>> getAllCourtsByStatus(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
-        Page<Court> courts = courtService.getAllCourtStatusTrue(page, size);
+    public ResponseEntity<Page<CourtDTO>> getAllCourtsByStatus(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "sortBy", defaultValue = "price") String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder) {
+
+        // Convert sortOrder to Sort.Direction
+        Sort.Direction direction = Sort.Direction.fromString(sortOrder);
+
+        Page<Court> courts = courtService.getAllCourtStatusTrue(page, size, sortBy, direction);
         return ResponseEntity.ok().body(courtService.courtDTOConverter(page, size, courts));
     }
     @GetMapping("/manage")
     public ResponseEntity<Page<CourtDTO>> getAllCourts(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
+                                                       @RequestParam(value = "size", defaultValue = "100") int size) {
         Page<Court> courts = courtService.getAllCourt(page, size);
         return ResponseEntity.ok().body(courtService.courtDTOConverter(page, size, courts));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<CourtDTO>> getAllCourtsByUserId(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                               @RequestParam(value = "size", defaultValue = "10") int size,
+                                                               @RequestParam(value = "size", defaultValue = "100") int size,
                                                                @PathVariable String userId) {
         Page<Court> courts = courtService.getCourtByUserId(page, size, userId);
         return ResponseEntity.ok().body(courtService.courtDTOConverter(page, size,courts));
@@ -70,6 +78,15 @@ public class CourtController {
         try {
             courtService.deleteCourtByCourtId(courtId);
             return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/{courtId}")
+    public ResponseEntity<CourtDTO> getCourtByCourtId(@PathVariable String courtId) {
+        try {
+            Court court = courtService.getCourtByCourtId(courtId);
+            return ResponseEntity.ok(courtService.courtReturnToDTO(court));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

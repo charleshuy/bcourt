@@ -23,7 +23,7 @@ public class DistrictController {
     public ResponseEntity<DistrictDTO> createDistrict(@RequestBody District district) {
         District createdLoc = service.createDistrict(district);
         URI path = URI.create("/districts" + createdLoc.getDistrictId());
-        return ResponseEntity.created(path).body(service.distrctReturnToDTO(createdLoc));
+        return ResponseEntity.created(path).body(service.districtReturnToDTO(createdLoc));
     }
     @GetMapping
     public List<DistrictDTO> getAllDistrict() {
